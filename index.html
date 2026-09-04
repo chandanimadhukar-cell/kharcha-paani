@@ -92,7 +92,20 @@
   section:last-of-type{border-bottom:none}
   h2{font-size:13.5px;font-weight:600;margin:0 0 16px;color:var(--ink-soft)}
 
-  .bar-row{margin-bottom:16px}
+  .subtotal{font-size:13px;color:var(--ink-soft);margin-top:8px}
+  .subtotal b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .bar-row{margin-bottom:16px;cursor:pointer;transition:opacity .2s}
+  .bar-row.dim{opacity:.22}
+  .tag{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);border:1px solid var(--rule);padding:1px 6px;border-radius:999px;margin-left:7px;vertical-align:middle}
+  .chart-divider{font-size:11.5px;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:14px;margin:4px 0 14px;font-weight:600}
+  .filterbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:11px 13px;background:var(--card);border:1px solid var(--rule);border-radius:12px;font-size:13px}
+  .filterbar .fb-actions{display:flex;gap:8px;align-items:center}
+  .filterbar button{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--rule);white-space:nowrap}
+  .filterbar button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .filterbar .x{color:var(--ink-soft)}
+  .when-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--rule);background:var(--card);border-radius:11px;padding:10px 10px 10px 13px}
+  .pencil{width:36px;height:36px;flex:none;border-radius:9px;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;font-size:15px}
+  .pencil[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .bar-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px}
   .bar-name{font-size:14.5px;font-weight:500}
   .bar-amt{font-size:14px;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -192,6 +205,7 @@
   <div class="total" id="totalBox">
     <div class="amount num" id="amountLine"></div>
     <div class="meta" id="totalMeta">No expenses yet</div>
+    <div class="subtotal" id="subtotal"></div>
   </div>
   <div class="menu" id="periodMenu" role="menu"></div>
 </header>
@@ -247,8 +261,12 @@
   </div>
 
   <div class="field">
-    <label for="when">When</label>
-    <input class="dt" id="when" type="datetime-local">
+    <label>When</label>
+    <div class="when-row">
+      <span id="whenText" class="num">—</span>
+      <button type="button" class="pencil" id="whenEdit" aria-pressed="false" aria-label="Change date and time">✎</button>
+    </div>
+    <input class="dt" id="when" type="datetime-local" hidden style="margin-top:8px">
   </div>
 
   <div class="field">
@@ -315,7 +333,7 @@ const PALETTE = ['#FF5A5F','#FFA62B','#57C84D','#22B8CF','#7C5CFF','#F0508C','#3
 const CAP  = 100000;   // above this: red
 const WARN = 70000;    // 70k to 1L: amber
 
-let db = { expenses: [], customCats: [], lastBackup: 0 };
+let db = { expenses: [], customCats: [], excluded: [], lastBackup: 0 };
 
 function loadFrom(raw){
   try {
@@ -324,6 +342,7 @@ function loadFrom(raw){
     return {
       expenses: Array.isArray(p.expenses) ? p.expenses : [],
       customCats: Array.isArray(p.customCats) ? p.customCats : [],
+      excluded: Array.isArray(p.excluded) ? p.excluded : [],
       lastBackup: p.lastBackup || 0
     };
   } catch(e){ return null; }
@@ -337,6 +356,7 @@ function mergeInto(target, incoming){
   const seen = new Set(target.expenses.map(x => x.id));
   incoming.expenses.forEach(x => { if (x && x.id && !seen.has(x.id)){ target.expenses.push(x); seen.add(x.id); changed = true; } });
   incoming.customCats.forEach(c => { if (!target.customCats.includes(c) && !BASE_CATS.includes(c)){ target.customCats.push(c); changed = true; } });
+  incoming.excluded.forEach(c => { if (!target.excluded.includes(c)){ target.excluded.push(c); changed = true; } });
   if (incoming.lastBackup > target.lastBackup) target.lastBackup = incoming.lastBackup;
   return changed;
 }
@@ -349,6 +369,7 @@ function save(){
 }
 
 const allCats = () => BASE_CATS.concat(db.customCats);
+const isOneTime = (cat) => db.excluded.includes(cat);
 const colorFor = (cat) => {
   const list = allCats();
   const i = list.indexOf(cat);
@@ -368,6 +389,7 @@ const localInput = (d) => { const p = n => String(n).padStart(2,'0');
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let viewMode = 'month';
+let activeCat = null;
 let currentMonth = monthKey(new Date());
 let currentYear = String(new Date().getFullYear());
 
@@ -400,53 +422,84 @@ const ZONE = { high:'Over limit', mid:'Watch it', low:'Safe zone' };
 /* ============ render ============ */
 function render(){
   const rows = inPeriod();
-  const total = rows.reduce((s,e) => s + e.amount, 0);
+  const counted = rows.filter(e => !isOneTime(e.category));
+  const oneTime = rows.filter(e => isOneTime(e.category));
+  const total = counted.reduce((s,e) => s + e.amount, 0);
+  const oneTimeTotal = oneTime.reduce((s,e) => s + e.amount, 0);
   const z = band(total);
 
   document.getElementById('periodLabel').textContent =
     viewMode === 'month' ? shortLabel(currentMonth) : currentYear;
 
   const box = document.getElementById('totalBox');
-  box.className = 'total ' + (rows.length ? z : 'low');
+  box.className = 'total ' + (counted.length ? z : 'low');
   document.getElementById('amountLine').innerHTML =
-    `${rows.length && z === 'mid' ? '<span class="warn">⚠</span>' : ''}<span class="sym">₹</span>${money(total)}`;
+    `${counted.length && z === 'mid' ? '<span class="warn">⚠</span>' : ''}<span class="sym">₹</span>${money(total)}`;
   document.getElementById('totalMeta').innerHTML = rows.length
-    ? `${rows.length} ${rows.length === 1 ? 'entry' : 'entries'} in ${periodName()} · <span class="zone">${ZONE[z]}</span>`
+    ? `${counted.length} ${counted.length === 1 ? 'entry' : 'entries'} in ${periodName()} · <span class="zone">${ZONE[z]}</span>`
     : `Nothing recorded in ${periodName()}`;
+  document.getElementById('subtotal').innerHTML = oneTimeTotal
+    ? `One-time costs: <b>₹${money(oneTimeTotal)}</b> — not counted above`
+    : '';
 
-  const byCat = {};
-  rows.forEach(e => byCat[e.category] = (byCat[e.category] || 0) + e.amount);
-  const sorted = Object.entries(byCat).sort((a,b) => b[1] - a[1]);
+  const sum = (list) => {
+    const by = {};
+    list.forEach(e => by[e.category] = (by[e.category] || 0) + e.amount);
+    return Object.entries(by).sort((a,b) => b[1] - a[1]);
+  };
+  const sorted = sum(counted), sortedOne = sum(oneTime);
   const chart = document.getElementById('chart');
 
-  if (!sorted.length){
+  const barRow = (cat, amt, max, one) => {
+    const pct = total ? amt / total * 100 : 0;
+    return `<div class="bar-row${activeCat && activeCat !== cat ? ' dim' : ''}" data-cat="${esc(cat)}">
+      <div class="bar-head">
+        <div class="bar-name">${esc(cat)}${one ? '<span class="tag">one-time</span>' : ''}</div>
+        <div class="right">
+          <div class="bar-amt num">₹${money(amt)}</div>
+          <div class="bar-pct num" style="color:${colorFor(cat)}">${one ? '' : pct.toFixed(pct < 10 ? 1 : 0) + '%'}</div>
+        </div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(amt/max*100).toFixed(2)}%;background:${colorFor(cat)}"></div></div>
+    </div>`;
+  };
+
+  if (!sorted.length && !sortedOne.length){
     chart.innerHTML = `<p class="empty">Add your first expense and the split by category shows up here.</p>`;
   } else {
-    const max = sorted[0][1];
-    chart.innerHTML = sorted.map(([cat,amt]) => {
-      const pct = total ? amt / total * 100 : 0;
-      return `<div class="bar-row">
-        <div class="bar-head">
-          <div class="bar-name">${esc(cat)}</div>
-          <div class="right">
-            <div class="bar-amt num">₹${money(amt)}</div>
-            <div class="bar-pct num" style="color:${colorFor(cat)}">${pct.toFixed(pct < 10 ? 1 : 0)}%</div>
-          </div>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:${(amt/max*100).toFixed(2)}%;background:${colorFor(cat)}"></div></div>
-      </div>`;
-    }).join('');
+    const max = sorted.length ? sorted[0][1] : 1;
+    const maxOne = sortedOne.length ? sortedOne[0][1] : 1;
+    chart.innerHTML =
+      sorted.map(([c,a]) => barRow(c,a,max,false)).join('') +
+      (sortedOne.length ? `<div class="chart-divider">One-time costs</div>` + sortedOne.map(([c,a]) => barRow(c,a,maxOne,true)).join('') : '');
+    chart.querySelectorAll('.bar-row').forEach(r => r.onclick = () => {
+      activeCat = activeCat === r.dataset.cat ? null : r.dataset.cat;
+      render();
+    });
   }
 
   const wrap = document.getElementById('tableWrap');
-  if (!rows.length){
-    wrap.innerHTML = `<p class="empty">No entries in ${esc(periodName())}. Tap Add expense to record one.</p>`;
+  const shown = activeCat ? rows.filter(e => e.category === activeCat) : rows;
+
+  let filterBar = '';
+  if (activeCat){
+    const t = shown.reduce((s,e) => s + e.amount, 0);
+    filterBar = `<div class="filterbar">
+      <span><b>${esc(activeCat)}</b> · ₹${money(t)} · ${shown.length} ${shown.length === 1 ? 'entry' : 'entries'}</span>
+      <span class="fb-actions">
+        <button id="oneTimeBtn" aria-pressed="${isOneTime(activeCat)}">${isOneTime(activeCat) ? 'One-time ✓' : 'Mark one-time'}</button>
+        <button id="clearFilter" class="x">Clear</button>
+      </span></div>`;
+  }
+
+  if (!shown.length){
+    wrap.innerHTML = filterBar + `<p class="empty">No entries in ${esc(periodName())}. Tap Add expense to record one.</p>`;
   } else {
-    wrap.innerHTML = `<table class="tbl">
+    wrap.innerHTML = filterBar + `<table class="tbl">
       <thead><tr>
         <th class="c-date">Date</th><th class="c-cat">Category</th><th class="c-amt">Amount</th>
       </tr></thead>
-      <tbody>${rows.map(e => `
+      <tbody>${shown.map(e => `
         <tr data-id="${e.id}">
           <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
           <td><div class="cat-cell"><i class="dot" style="background:${colorFor(e.category)}"></i>${esc(e.category)}</div><span class="sub">${esc(e.mode)}${e.note ? ' · ' + esc(e.note) : ''}</span></td>
@@ -455,6 +508,16 @@ function render(){
       </tbody></table>`;
     wrap.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
   }
+
+  const clearBtn = document.getElementById('clearFilter');
+  if (clearBtn) clearBtn.onclick = () => { activeCat = null; render(); };
+  const otBtn = document.getElementById('oneTimeBtn');
+  if (otBtn) otBtn.onclick = () => {
+    if (isOneTime(activeCat)) db.excluded = db.excluded.filter(c => c !== activeCat);
+    else db.excluded.push(activeCat);
+    save(); render();
+    toast(isOneTime(activeCat) ? `${activeCat} excluded from totals` : `${activeCat} back in totals`);
+  };
 
   renderBanners();
 }
@@ -573,6 +636,22 @@ function drawChips(){
   }, { once: true }));
 }
 
+function syncWhenText(){
+  const v = document.getElementById('when').value;
+  const d = v ? new Date(v) : new Date();
+  const today = new Date();
+  const sameDay = d.toDateString() === today.toDateString();
+  document.getElementById('whenText').textContent =
+    (sameDay ? 'Today' : fmtDate(d.getTime())) + ', ' + fmtTime(d.getTime());
+}
+document.getElementById('when').addEventListener('change', syncWhenText);
+document.getElementById('whenEdit').onclick = (ev) => {
+  const inp = document.getElementById('when');
+  inp.hidden = !inp.hidden;
+  ev.currentTarget.setAttribute('aria-pressed', String(!inp.hidden));
+  if (!inp.hidden) inp.focus();
+};
+
 function openForm(existing){
   editingId = existing ? existing.id : null;
   saving = false;
@@ -586,7 +665,11 @@ function openForm(existing){
   amtIn.value = existing ? String(existing.amount) : '';
   newCat.value = ''; newCat.hidden = true;
   document.getElementById('note').value = existing && existing.note ? existing.note : '';
-  document.getElementById('when').value = localInput(new Date(existing ? existing.ts : Date.now()));
+  const whenIn = document.getElementById('when');
+  whenIn.value = localInput(new Date(existing ? existing.ts : Date.now()));
+  whenIn.hidden = true;
+  document.getElementById('whenEdit').setAttribute('aria-pressed','false');
+  syncWhenText();
   document.querySelectorAll('.mode').forEach(m => m.setAttribute('aria-pressed', pickedMode === m.dataset.mode));
 
   drawChips();
