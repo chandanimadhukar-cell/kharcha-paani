@@ -532,8 +532,8 @@ function render(){
     const groups = {};
     shown.forEach(e => { (groups[e.category] = groups[e.category] || []).push(e); });
     const gs = Object.entries(groups)
-      .map(([c,items]) => ({ c, items, total: items.reduce((s,x) => s + x.amount, 0) }))
-      .sort((a,b) => b.total - a.total);
+      .map(([c,items]) => ({ c, items, total: items.reduce((s,x) => s + x.amount, 0), latest: Math.max(...items.map(x => x.ts)) }))
+      .sort((a,b) => b.latest - a.latest);
     const forceOpen = !!activeCat || !!activeDate;
 
     wrap.innerHTML = filterBar + gs.map(g => {
