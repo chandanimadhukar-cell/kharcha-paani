@@ -127,6 +127,24 @@
   .tbl tbody tr{cursor:pointer}
   .amt{font-variant-numeric:tabular-nums;font-weight:500;white-space:nowrap;font-size:13.5px}
 
+  .sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+  .sec-head h2{margin:0}
+  .date-filter{display:flex;align-items:center;gap:6px}
+  .datepill{border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:6px 11px;font-size:12.5px;color:var(--ink);min-width:0}
+  .x-btn{border:1px solid var(--rule);background:var(--card);border-radius:999px;width:28px;height:28px;font-size:13px;color:var(--ink-soft)}
+  .group{border-bottom:1px solid var(--rule-soft)}
+  .group:last-child{border-bottom:none}
+  .group-head{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;text-align:left}
+  .g-left{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:500;min-width:0}
+  .g-left .dot{margin-top:0}
+  .g-count{font-size:11.5px;color:var(--ink-soft);border:1px solid var(--rule);border-radius:999px;padding:1px 7px;font-weight:500;flex:none}
+  .g-right{display:flex;align-items:center;gap:10px;flex:none}
+  .g-right b{font-variant-numeric:tabular-nums;font-size:14px}
+  .chev{display:inline-block;color:var(--ink-soft);font-size:17px;line-height:1;transform:rotate(90deg);transition:transform .18s}
+  .chev.open{transform:rotate(-90deg)}
+  .tbl.grp{margin:0 0 12px}
+  .tbl.grp td{font-size:13px;padding:9px 6px 9px 0;border-bottom:1px solid var(--rule-soft)}
+  .tbl.grp tr:last-child td{border-bottom:none}
   .empty{color:var(--ink-soft);font-size:14px;padding:14px 0 18px;max-width:42ch}
   .note-line{font-size:12.5px;color:var(--ink-soft);padding:18px 0 0;line-height:1.7}
   .note-line button{text-decoration:underline;font-size:12.5px;color:var(--ink-soft);padding:0}
@@ -217,7 +235,13 @@
   </section>
 
   <section>
-    <h2>Every entry</h2>
+    <div class="sec-head">
+      <h2>Every entry</h2>
+      <div class="date-filter">
+        <input type="date" id="dateInput" class="datepill" aria-label="Filter by date">
+        <button class="x-btn" id="clearDate" hidden aria-label="Clear date filter">✕</button>
+      </div>
+    </div>
     <div id="tableWrap"></div>
     <div id="banners"></div>
     <div class="note-line">
@@ -386,10 +410,14 @@ const fmtDate = (ts) => new Date(ts).toLocaleDateString('en-IN',{ day:'numeric',
 const fmtTime = (ts) => new Date(ts).toLocaleTimeString('en-IN',{ hour:'numeric', minute:'2-digit', hour12:true });
 const localInput = (d) => { const p = n => String(n).padStart(2,'0');
   return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+const dayKey = (ts) => { const d = new Date(ts); const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; };
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let viewMode = 'month';
 let activeCat = null;
+let activeDate = null;
+const openCats = new Set();
 let currentMonth = monthKey(new Date());
 let currentYear = String(new Date().getFullYear());
 
@@ -479,38 +507,66 @@ function render(){
   }
 
   const wrap = document.getElementById('tableWrap');
-  const shown = activeCat ? rows.filter(e => e.category === activeCat) : rows;
+  let shown = rows;
+  if (activeCat) shown = shown.filter(e => e.category === activeCat);
+  if (activeDate) shown = shown.filter(e => dayKey(e.ts) === activeDate);
+  document.getElementById('clearDate').hidden = !activeDate;
 
   let filterBar = '';
-  if (activeCat){
+  if (activeCat || activeDate){
     const t = shown.reduce((s,e) => s + e.amount, 0);
+    const bits = [];
+    if (activeCat) bits.push(`<b>${esc(activeCat)}</b>`);
+    if (activeDate) bits.push(`<b>${fmtDate(new Date(activeDate + 'T00:00').getTime())}</b>`);
     filterBar = `<div class="filterbar">
-      <span><b>${esc(activeCat)}</b> · ₹${money(t)} · ${shown.length} ${shown.length === 1 ? 'entry' : 'entries'}</span>
+      <span>${bits.join(' · ')} · ₹${money(t)} · ${shown.length} ${shown.length === 1 ? 'entry' : 'entries'}</span>
       <span class="fb-actions">
-        <button id="oneTimeBtn" aria-pressed="${isOneTime(activeCat)}">${isOneTime(activeCat) ? 'One-time ✓' : 'Mark one-time'}</button>
-        <button id="clearFilter" class="x">Clear</button>
+        ${activeCat ? `<button id="oneTimeBtn" aria-pressed="${isOneTime(activeCat)}">${isOneTime(activeCat) ? 'One-time ✓' : 'Mark one-time'}</button>` : ''}
+        <button id="clearFilter" class="x">Clear all</button>
       </span></div>`;
   }
 
   if (!shown.length){
-    wrap.innerHTML = filterBar + `<p class="empty">No entries in ${esc(periodName())}. Tap Add expense to record one.</p>`;
+    wrap.innerHTML = filterBar + `<p class="empty">${activeCat || activeDate ? 'Nothing matches these filters.' : `No entries in ${esc(periodName())}. Tap Add expense to record one.`}</p>`;
   } else {
-    wrap.innerHTML = filterBar + `<table class="tbl">
-      <thead><tr>
-        <th class="c-date">Date</th><th class="c-cat">Category</th><th class="c-amt">Amount</th>
-      </tr></thead>
-      <tbody>${shown.map(e => `
-        <tr data-id="${e.id}">
-          <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
-          <td><div class="cat-cell"><i class="dot" style="background:${colorFor(e.category)}"></i>${esc(e.category)}</div><span class="sub">${esc(e.mode)}${e.note ? ' · ' + esc(e.note) : ''}</span></td>
-          <td class="amt num">₹${money(e.amount)}</td>
-        </tr>`).join('')}
-      </tbody></table>`;
+    const groups = {};
+    shown.forEach(e => { (groups[e.category] = groups[e.category] || []).push(e); });
+    const gs = Object.entries(groups)
+      .map(([c,items]) => ({ c, items, total: items.reduce((s,x) => s + x.amount, 0) }))
+      .sort((a,b) => b.total - a.total);
+    const forceOpen = !!activeCat || !!activeDate;
+
+    wrap.innerHTML = filterBar + gs.map(g => {
+      const open = forceOpen || openCats.has(g.c);
+      return `<div class="group">
+        <button class="group-head" data-cat="${esc(g.c)}">
+          <span class="g-left"><i class="dot" style="background:${colorFor(g.c)}"></i>${esc(g.c)}<span class="g-count">${g.items.length}</span></span>
+          <span class="g-right"><b class="num">₹${money(g.total)}</b><span class="chev${open ? ' open' : ''}">›</span></span>
+        </button>
+        ${open ? `<table class="tbl grp"><tbody>${g.items.map(e => `
+          <tr data-id="${e.id}">
+            <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
+            <td>${esc(e.mode)}${e.note ? `<span class="sub">${esc(e.note)}</span>` : ''}</td>
+            <td class="amt num">₹${money(e.amount)}</td>
+          </tr>`).join('')}</tbody></table>` : ''}
+      </div>`;
+    }).join('');
+
+    wrap.querySelectorAll('.group-head').forEach(h => h.onclick = () => {
+      if (forceOpen) return;
+      const c = h.dataset.cat;
+      openCats.has(c) ? openCats.delete(c) : openCats.add(c);
+      render();
+    });
     wrap.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
   }
 
   const clearBtn = document.getElementById('clearFilter');
-  if (clearBtn) clearBtn.onclick = () => { activeCat = null; render(); };
+  if (clearBtn) clearBtn.onclick = () => {
+    activeCat = null; activeDate = null;
+    document.getElementById('dateInput').value = '';
+    render();
+  };
   const otBtn = document.getElementById('oneTimeBtn');
   if (otBtn) otBtn.onclick = () => {
     if (isOneTime(activeCat)) db.excluded = db.excluded.filter(c => c !== activeCat);
@@ -557,6 +613,7 @@ document.querySelectorAll('#viewToggle button').forEach(b => b.onclick = () => {
     currentMonth = String(now.getFullYear()) === currentYear ? monthKey(now) : `${currentYear}-01`;
   }
   viewMode = next;
+  activeDate = null; document.getElementById('dateInput').value = '';
   document.querySelectorAll('#viewToggle button').forEach(x => x.setAttribute('aria-pressed', x === b));
   render();
 });
@@ -590,6 +647,7 @@ periodBtn.onclick = (ev) => {
 
   menu.querySelectorAll('button').forEach(b => b.onclick = () => {
     if (viewMode === 'month') currentMonth = b.dataset.p; else currentYear = b.dataset.p;
+    activeDate = null; document.getElementById('dateInput').value = '';
     menu.classList.remove('open');
     periodBtn.setAttribute('aria-expanded', false);
     render();
@@ -599,6 +657,21 @@ document.addEventListener('click', () => {
   menu.classList.remove('open');
   periodBtn.setAttribute('aria-expanded', false);
 });
+
+/* ============ date filter ============ */
+const dateInput = document.getElementById('dateInput');
+dateInput.onchange = () => {
+  activeDate = dateInput.value || null;
+  if (activeDate){
+    const d = new Date(activeDate + 'T00:00');
+    currentMonth = monthKey(d);
+    currentYear = String(d.getFullYear());
+  }
+  render();
+};
+document.getElementById('clearDate').onclick = () => {
+  activeDate = null; dateInput.value = ''; render();
+};
 
 /* ============ add sheet ============ */
 const scrim = document.getElementById('scrim');
