@@ -179,6 +179,12 @@
   .amount-wrap .sym{font-family:'Fraunces',Georgia,serif;font-size:26px;opacity:.5;padding-bottom:10px}
   .amount-in{width:100%;border:none;background:transparent;font-family:'Fraunces',Georgia,serif;font-size:36px;padding:0 0 8px;font-variant-numeric:tabular-nums;border-radius:0}
   .amount-in:focus{outline:none}
+  .calcbar{display:flex;gap:6px;margin-top:10px}
+  .calckey{flex:1;border:1px solid var(--rule);background:var(--card);border-radius:9px;padding:10px 0;font-size:16px;text-align:center;color:var(--ink)}
+  .calckey:active{background:var(--rule-soft)}
+  .calcout{font-size:13px;margin-top:9px;min-height:18px;font-variant-numeric:tabular-nums}
+  .calcout.ok{color:var(--green);font-weight:600}
+  .calcout.bad{color:var(--red)}
   .chips{display:flex;flex-wrap:wrap;gap:8px}
   .chip{border:1px solid var(--rule);background:var(--card);padding:9px 13px;border-radius:999px;font-size:14px;display:flex;align-items:center;gap:7px}
   .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -265,8 +271,18 @@
     <label for="amt">Amount</label>
     <div class="amount-wrap">
       <span class="sym">₹</span>
-      <input class="amount-in num" id="amt" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+      <input class="amount-in num" id="amt" type="text" inputmode="decimal" placeholder="0 or =69+61+52" autocomplete="off">
     </div>
+    <div class="calcbar">
+      <button type="button" class="calckey" data-k="+">+</button>
+      <button type="button" class="calckey" data-k="-">−</button>
+      <button type="button" class="calckey" data-k="*">×</button>
+      <button type="button" class="calckey" data-k="/">÷</button>
+      <button type="button" class="calckey" data-k="(">(</button>
+      <button type="button" class="calckey" data-k=")">)</button>
+      <button type="button" class="calckey" data-k="back">⌫</button>
+    </div>
+    <div class="calcout" id="calcOut"></div>
   </div>
 
   <div class="field">
@@ -736,6 +752,8 @@ function openForm(existing){
   pickedCat = existing ? existing.category : null;
   pickedMode = existing ? existing.mode : null;
   amtIn.value = existing ? String(existing.amount) : '';
+  document.getElementById('calcOut').textContent = '';
+  document.getElementById('calcOut').className = 'calcout';
   newCat.value = ''; newCat.hidden = true;
   document.getElementById('note').value = existing && existing.note ? existing.note : '';
   const whenIn = document.getElementById('when');
@@ -763,13 +781,84 @@ document.querySelectorAll('.mode').forEach(m => m.onclick = () => {
   document.querySelectorAll('.mode').forEach(x => x.setAttribute('aria-pressed', x === m));
 });
 
+/* ---- tiny calculator: + - * / and brackets, normal BODMAS ---- */
+function evalExpr(raw){
+  let s = String(raw).replace(/^\s*=/,'').replace(/[×xX]/g,'*').replace(/÷/g,'/')
+                     .replace(/[−–]/g,'-').replace(/,/g,'').trim();
+  if (!s) return null;
+  if (!/^[0-9+\-*/(). ]+$/.test(s)) return null;
+  const tk = s.match(/\d+\.?\d*|[+\-*/()]/g);
+  if (!tk) return null;
+  let i = 0;
+  const peek = () => tk[i];
+  function expr(){
+    let v = term();
+    while (peek() === '+' || peek() === '-'){
+      const op = tk[i++], r = term();
+      if (v === null || r === null) return null;
+      v = op === '+' ? v + r : v - r;
+    }
+    return v;
+  }
+  function term(){
+    let v = factor();
+    while (peek() === '*' || peek() === '/'){
+      const op = tk[i++], r = factor();
+      if (v === null || r === null || (op === '/' && r === 0)) return null;
+      v = op === '*' ? v * r : v / r;
+    }
+    return v;
+  }
+  function factor(){
+    if (peek() === '-'){ i++; const v = factor(); return v === null ? null : -v; }
+    if (peek() === '+'){ i++; return factor(); }
+    if (peek() === '('){ i++; const v = expr(); if (tk[i] !== ')') return null; i++; return v; }
+    const t = tk[i];
+    if (t === undefined || !/^\d/.test(t)) return null;
+    i++; return parseFloat(t);
+  }
+  const val = expr();
+  if (val === null || i !== tk.length || !isFinite(val)) return null;
+  return Math.round(val * 100) / 100;
+}
+
+const isExpression = (v) => /^\s*=/.test(v) || /[+\-*/()×÷]/.test(String(v).slice(1));
+
+function updateCalc(){
+  const out = document.getElementById('calcOut');
+  const v = amtIn.value;
+  if (!isExpression(v)){ out.textContent = ''; out.className = 'calcout'; return; }
+  const r = evalExpr(v);
+  if (r === null){ out.textContent = 'Incomplete expression'; out.className = 'calcout bad'; }
+  else { out.textContent = '= ₹' + money(r); out.className = 'calcout ok'; }
+}
+amtIn.addEventListener('input', updateCalc);
+
+document.querySelectorAll('.calckey').forEach(k => k.onclick = () => {
+  const el = amtIn;
+  const a = el.selectionStart ?? el.value.length;
+  const b = el.selectionEnd ?? a;
+  if (k.dataset.k === 'back'){
+    if (a === b && a > 0) el.value = el.value.slice(0, a-1) + el.value.slice(a);
+    else el.value = el.value.slice(0, a) + el.value.slice(b);
+    var pos = a === b ? Math.max(0, a-1) : a;
+  } else {
+    el.value = el.value.slice(0, a) + k.dataset.k + el.value.slice(b);
+    var pos = a + 1;
+  }
+  el.focus();
+  try { el.setSelectionRange(pos, pos); } catch(e){}
+  updateCalc();
+});
+
 const fail = (msg) => { errEl.textContent = msg; };
 
 saveBtn.addEventListener('click', () => {
   if (saving) return;
 
-  const amount = parseFloat(String(amtIn.value).replace(/[^\d.]/g,''));
-  if (!amount || amount <= 0) return fail('Enter an amount greater than zero.');
+  const amount = evalExpr(amtIn.value);
+  if (amount === null) return fail('That expression is incomplete — check the brackets and operators.');
+  if (amount <= 0) return fail('Enter an amount greater than zero.');
   if (!pickedCat) return fail('Pick a category.');
 
   let category = pickedCat, newCategoryToAdd = null;
