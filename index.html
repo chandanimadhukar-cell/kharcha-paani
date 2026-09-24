@@ -72,6 +72,7 @@
   .total.low .amount{color:var(--green)}
   .total .meta{color:var(--ink-soft);font-size:13.5px;margin-top:9px}
   .zone{font-weight:600}
+  .ticker{color:var(--ink-soft);white-space:nowrap}
   .total.high .zone{color:var(--red)}
   .total.mid .zone{color:var(--amber)}
   .total.low .zone{color:var(--green)}
@@ -463,6 +464,20 @@ function band(total){
 }
 const ZONE = { high:'Over limit', mid:'Watch it', low:'Safe zone' };
 
+function daysToReset(){
+  const now = new Date();
+  if (viewMode === 'month'){
+    if (currentMonth !== monthKey(now)) return null;          // only for the running month
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    return lastDay - now.getDate();
+  }
+  if (currentYear !== String(now.getFullYear())) return null;
+  const endOfYear = new Date(now.getFullYear(), 11, 31);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((endOfYear - today) / 86400000);
+}
+const resetText = (n) => n === 0 ? 'last day' : `${n} day${n === 1 ? '' : 's'} to reset`;
+
 /* ============ render ============ */
 function render(){
   const rows = inPeriod();
@@ -479,9 +494,11 @@ function render(){
   box.className = 'total ' + (counted.length ? z : 'low');
   document.getElementById('amountLine').innerHTML =
     `${counted.length && z === 'mid' ? '<span class="warn">⚠</span>' : ''}<span class="sym">₹</span>${money(total)}`;
+  const dl = daysToReset();
+  const ticker = dl === null ? '' : ` · <span class="ticker">${resetText(dl)}</span>`;
   document.getElementById('totalMeta').innerHTML = rows.length
-    ? `${counted.length} ${counted.length === 1 ? 'entry' : 'entries'} in ${periodName()} · <span class="zone">${ZONE[z]}</span>`
-    : `Nothing recorded in ${periodName()}`;
+    ? `${counted.length} ${counted.length === 1 ? 'entry' : 'entries'} in ${periodName()} · <span class="zone">${ZONE[z]}</span>${ticker}`
+    : `Nothing recorded in ${periodName()}${ticker}`;
   document.getElementById('subtotal').innerHTML = oneTimeTotal
     ? `One-time costs: <b>₹${money(oneTimeTotal)}</b> — not counted above`
     : '';
