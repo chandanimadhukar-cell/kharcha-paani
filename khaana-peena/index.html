@@ -56,6 +56,12 @@
   .daynav button{width:32px;height:32px;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-size:15px;color:var(--ink-soft)}
   .daynav button[disabled]{opacity:.35}
   .daynav .lbl{font-size:13.5px;font-weight:600;min-width:84px;text-align:center}
+  .datepick{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+  .datepick .car{font-size:10px;color:var(--ink-soft)}
+  .datepill{position:relative;display:inline-flex;align-items:center;gap:4px;flex:none;border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;cursor:pointer}
+  .datepill .car{font-size:10px;color:var(--ink-soft)}
+  .datepick input,.datepill input{position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0;padding:0;margin:0;cursor:pointer;-webkit-appearance:none;appearance:none}
+  .for-day{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);margin-top:10px}
 
   main{padding:0 18px;max-width:640px;margin:0 auto}
   section{padding:24px 0 6px;border-bottom:1px solid var(--rule-soft)}
@@ -361,7 +367,7 @@
     <div class="wordmark" id="wordmark">Khaana Peena</div>
     <div class="daynav" id="dayNav">
       <button id="prevDay" aria-label="Previous day">‹</button>
-      <div class="lbl" id="dayLabel">Today</div>
+      <label class="lbl datepick"><span id="dayLabel">Today</span><span class="car">▼</span><input type="date" id="dayPick" aria-label="Pick a day"></label>
       <button id="nextDay" aria-label="Next day">›</button>
     </div>
   </div>
@@ -423,7 +429,8 @@
       <div id="weightSummary" class="meta" style="margin:0 0 10px"></div>
       <div id="weightChart"></div>
       <div class="weigh-row">
-        <input class="txt num" id="weightIn" inputmode="decimal" placeholder="Today's weight in kg" aria-label="Today's weight in kg">
+        <label class="datepill"><span id="wDayLbl">Today</span><span class="car">▼</span><input type="date" id="wDay" aria-label="Day of weigh-in"></label>
+        <input class="txt num" id="weightIn" inputmode="decimal" placeholder="Weight in kg" aria-label="Weight in kg">
         <button id="weightSave">Log</button>
       </div>
       <p class="note-line">Weigh yourself in the morning, after the toilet and before eating. Daily weight moves 1–2 kg with water and salt, so the <b>7-day average</b> is the number to watch.</p>
@@ -486,6 +493,7 @@
     <section>
       <h2>My foods</h2>
       <div id="myFoods"></div>
+      <div id="savedDishes"></div>
     </section>
     <section>
       <h2>Your data</h2>
@@ -517,6 +525,7 @@
   <div class="sheet-top">
     <div class="grab"></div>
     <div class="sheet-title"><h3 id="addTitle">Log food</h3><button class="x-close" data-close aria-label="Close">Done</button></div>
+    <div class="for-day">Logging for <label class="datepill"><span id="addDayLbl">Today</span><span class="car">▼</span><input type="date" id="addDayPick" aria-label="Day to log for"></label></div>
     <div class="chips" id="mealChips"></div>
     <input class="txt" id="q" placeholder="Search: roti, dal, paneer, egg…" autocomplete="off">
   </div>
@@ -737,7 +746,7 @@ const DIET_NAME = { vegan:'Vegan', veg:'Vegetarian', egg:'Eggetarian', nonveg:'N
 const GOAL_NAME = { lose:'Lose fat', recomp:'Lose fat + build muscle', gain:'Build muscle', maintain:'Just eat better' };
 const ACT_NAME = { '1.2':'Mostly sitting', '1.375':'Lightly active', '1.55':'Active', '1.725':'Very active' };
 
-const emptyDb = () => ({ profile: null, targets: null, manual: false, entries: [], water: {}, weights: [], foods: [], notes: [], searches: [], lastBackup: 0 });
+const emptyDb = () => ({ profile: null, targets: null, manual: false, entries: [], water: {}, weights: [], foods: [], notes: [], searches: [], dishes: [], lastBackup: 0 });
 let db = emptyDb();
 
 function loadFrom(raw){
@@ -754,6 +763,7 @@ function loadFrom(raw){
       foods: Array.isArray(p.foods) ? p.foods : [],
       notes: Array.isArray(p.notes) ? p.notes : [],
       searches: Array.isArray(p.searches) ? p.searches : [],
+      dishes: Array.isArray(p.dishes) ? p.dishes : [],
       lastBackup: p.lastBackup || 0
     };
   } catch(e){ return null; }
@@ -772,7 +782,7 @@ function mergeInto(target, incoming){
   Object.entries(incoming.water).forEach(([d, n]) => { if (+n > (target.water[d] || 0)){ target.water[d] = +n; changed = true; } });
   const fids = new Set(target.foods.map(f => f.id));
   incoming.foods.forEach(f => { if (f && f.id && !fids.has(f.id)){ target.foods.push(f); fids.add(f.id); changed = true; } });
-  [['notes', x => x && x.id && x.text], ['searches', x => x && x.id && x.ref]].forEach(([key, ok]) => {
+  [['notes', x => x && x.id && x.text], ['searches', x => x && x.id && x.ref], ['dishes', x => x && x.id && x.ref]].forEach(([key, ok]) => {
     const have = new Set(target[key].map(x => x.id));
     incoming[key].forEach(x => { if (ok(x) && !have.has(x.id)){ target[key].push(x); have.add(x.id); changed = true; } });
   });
@@ -952,7 +962,23 @@ function libraryFoods(){
     id: f[0], name: f[1], unit: f[2], kcal: f[3], p: f[4], c: f[5], f: f[6], type: f[7]
   }));
   const mine = db.foods.map(f => ({ ...f, mine: true }));
-  return mine.concat(base);
+  return savedDishFoods().concat(mine, base);
+}
+// Dishes looked up in "What should I get cooked?" join the menu, with values worked out live
+// so later kitchen notes still apply to them.
+function savedDishFoods(){
+  return [...db.dishes].sort((a, b) => b.t - a.t).map(sd => {
+    const [kind, id] = sd.ref.split(':');
+    const n = nutritionFor({ kind, id, grams: sd.grams });
+    return n && { id: 'sd:' + sd.id, name: n.name, unit: sd.label, kcal: r0(n.kcal), p: r1(n.p), c: r1(n.c), f: r1(n.f), saved: true };
+  }).filter(Boolean);
+}
+function saveDish(st){
+  if (!st || st.kind !== 'dish') return;
+  const ref = `dish:${st.id}`, label = st.label.replace(' · a usual serving', '');
+  const same = db.dishes.find(d => d.ref === ref && d.grams === st.grams);
+  if (same){ same.t = Date.now(); same.label = label; return; }
+  db.dishes.push({ id: uid(), t: Date.now(), ref, grams: st.grams, label });
 }
 const findFood = (id) => libraryFoods().find(f => f.id === id)
   || db.foods.find(f => f.id === id);
@@ -1065,6 +1091,7 @@ $('waterMinus').onclick = () => { db.water[day] = Math.max(0, (db.water[day] || 
 
 $('prevDay').onclick = () => { day = shiftDay(day, -1); render(); };
 $('nextDay').onclick = () => { if (day < todayKey()) { day = shiftDay(day, 1); render(); } };
+$('dayPick').addEventListener('change', (e) => { const v = e.target.value; if (v && v <= todayKey()) day = v; render(); });
 
 /* ============ ADD FOOD SHEET ============ */
 let addMeal = 'Breakfast', picked = null, qty = 1;
@@ -1079,7 +1106,7 @@ function recentFoodIds(){
 
 function foodRow(f){
   return `<button class="frow" data-food="${esc(f.id)}" aria-pressed="${picked && picked.id === f.id}">
-    <span><span class="fn">${esc(f.name)}</span><span class="fu">${esc(f.unit)}${f.mine ? ' · my food' : ''}${f.adj ? ' · adjusted to your notes' : ''}</span></span>
+    <span><span class="fn">${esc(f.name)}</span><span class="fu">${esc(f.unit)}${f.mine ? ' · my food' : ''}${f.saved ? ' · from your searches' : ''}${f.adj ? ' · adjusted to your notes' : ''}</span></span>
     <span class="fk">${fmt(f.kcal)} kcal<br><b>${r1(f.p)} g protein</b></span>
   </button>`;
 }
@@ -1097,7 +1124,9 @@ function renderFoodList(){
     const byId = new Map(foods.map(f => [f.id, f]));
     const recent = recentFoodIds().map(id => byId.get(id)).filter(Boolean).slice(0, 8);
     if (recent.length) html += `<div class="grp">Recent</div>` + recent.map(foodRow).join('');
-    html += `<div class="grp">All foods</div>` + foods.map(foodRow).join('');
+    const saved = foods.filter(f => f.saved);
+    if (saved.length) html += `<div class="grp">From your searches</div>` + saved.map(foodRow).join('');
+    html += `<div class="grp">All foods</div>` + foods.filter(f => !f.saved).map(foodRow).join('');
   }
   $('flist').innerHTML = html;
 }
@@ -1124,12 +1153,21 @@ function openAdd(meal){
   addMeal = meal || (day === todayKey() ? mealForNow() : 'Lunch');
   picked = null; qty = 1;
   $('q').value = '';
-  $('addTitle').textContent = day === todayKey() ? 'Log food' : `Log food · ${dayLabel(day)}`;
+  setAddDay();
   renderMealChips($('mealChips'), addMeal);
   renderFoodList(); renderPicked();
   openSheet('addSheet');
 }
 
+function setAddDay(){
+  $('addDayLbl').textContent = dayLabel(day);
+  $('addDayPick').max = todayKey(); $('addDayPick').value = day;
+}
+$('addDayPick').addEventListener('change', (e) => {
+  const v = e.target.value;
+  if (v && v <= todayKey()){ day = v; setAddDay(); render(); }
+  else setAddDay();
+});
 $('addBtn').onclick = () => openAdd();
 $('q').addEventListener('input', renderFoodList);
 $('mealChips').addEventListener('click', (ev) => {
@@ -1297,6 +1335,7 @@ function renderProgress(){
 }
 
 function renderWeight(){
+  setWDay();
   const t = todayKey();
   const from = shiftDay(t, -(wRange - 1));
   const pts = db.weights.filter(w => w.day >= from).sort((a, b) => a.day < b.day ? -1 : 1);
@@ -1342,15 +1381,21 @@ $('wRange').addEventListener('click', (ev) => {
   $('wRange').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
   renderWeight();
 });
+let wDay = todayKey();
+function setWDay(){ $('wDayLbl').textContent = dayLabel(wDay); $('wDay').max = todayKey(); $('wDay').value = wDay; }
+$('wDay').addEventListener('change', (e) => { const v = e.target.value; if (v && v <= todayKey()) wDay = v; setWDay(); });
 $('weightSave').onclick = () => {
   const kg = num($('weightIn').value);
   if (!(kg >= 25 && kg <= 300)) return toast('Enter your weight in kg');
-  const t = todayKey();
-  db.weights = db.weights.filter(w => w.day !== t).concat({ day: t, kg: r1(kg) });
-  db.profile.weight = r1(kg);
+  const d = wDay;
+  db.weights = db.weights.filter(w => w.day !== d).concat({ day: d, kg: r1(kg) });
+  // targets follow the most recent weigh-in, not a back-dated one
+  const latest = db.weights.reduce((a, w) => w.day > a.day ? w : a);
+  db.profile.weight = latest.kg;
   if (!db.manual) db.targets = pickTargets(calcTargets(db.profile));
+  wDay = todayKey();
   save(); $('weightIn').value = ''; render();
-  toast(`Logged ${r1(kg)} kg`);
+  toast(`Logged ${r1(kg)} kg · ${dayLabel(d)}`);
 };
 
 /* ============ LEARN ============ */
@@ -1720,7 +1765,8 @@ function nutritionFor(st){
   return { name: d.name, ...dishNutrition(d, st.grams), tags: d.tags, dish: d };
 }
 
-let est = null;   // the result being shown: { kind, id, grams, pieces, servings, label, alts, histId }
+let est = null;
+let estDay = null;   // day the estimate would be logged to; set to today on each new estimate   // the result being shown: { kind, id, grams, pieces, servings, label, alts, histId }
 
 function runEstimate(text){
   const parsed = parseQuery(text);
@@ -1743,6 +1789,8 @@ function showCandidate(c, parsed, text, alts){
     if (db.searches.length > 200) db.searches.length = 200;
   }
   db.searches.sort((a, b) => b.t - a.t);
+  saveDish(est);
+  estDay = todayKey();
   save(); renderEst(); renderHistory();
 }
 
@@ -1766,7 +1814,9 @@ function renderEst(){
   const n = nutritionFor(est);
   if (!n){ est = null; box.innerHTML = ''; return; }
   const k = kitchen(), T = db.targets;
-  const today = totals(entriesOn(todayKey()));
+  if (!estDay || estDay > todayKey()) estDay = todayKey();
+  const today = totals(entriesOn(estDay));
+  const when = estDay === todayKey() ? 'today' : estDay === shiftDay(todayKey(), -1) ? 'yesterday' : `on ${dayLabel(estDay)}`;
   const pPct = n.p / T.protein * 100, kPct = n.kcal / T.kcal * 100;
   const leftK = T.kcal - today.kcal - n.kcal, leftP = T.protein - today.p - n.p;
   const fatNotes = [];
@@ -1801,11 +1851,11 @@ function renderEst(){
         <div class="track"><div class="fill protein" style="width:${Math.min(100, pPct)}%"></div></div></div>
       <div class="meter"><div class="meter-head"><b>Calories</b><span>${r0(kPct)}% of your ${fmt(T.kcal)}</span></div>
         <div class="track"><div class="fill kcal${kPct > 45 ? ' mid' : ''}" style="width:${Math.min(100, kPct)}%"></div></div></div>
-      <p class="est-p" style="margin:12px 0 0">If you eat this today, you'll have <b>${leftK >= 0 ? fmt(leftK) + ' kcal' : fmt(-leftK) + ' kcal over'}</b> and <b>${leftP > 0 ? r0(leftP) + ' g protein' : 'no protein'}</b> left${leftP > 0 ? '' : ' to go. Target hit'}.</p>
+      <p class="est-p" style="margin:12px 0 0">If you eat this ${when}, you'll have <b>${leftK >= 0 ? fmt(leftK) + ' kcal' : fmt(-leftK) + ' kcal over'}</b> and <b>${leftP > 0 ? r0(leftP) + ' g protein' : 'no protein'}</b> left${leftP > 0 ? '' : ' to go. Target hit'}.</p>
     </div>
     ${est.alts.length ? `<div class="alt-row">Not it? ${est.alts.map((a, i) => `<button class="ghost" data-alt="${i}">${esc(a.name)}</button>`).join('')}</div>` : ''}
     <div class="est-actions">
-      <div class="flabel">Log it to today's</div>
+      <div class="flabel" style="display:flex;align-items:center;gap:8px">Log it for <label class="datepill"><span>${dayLabel(estDay)}</span><span class="car">▼</span><input type="date" id="estDayPick" max="${todayKey()}" value="${estDay}" aria-label="Day to log for"></label></div>
       <div class="chips">${MEALS.map(m => `<button class="chip" data-logto="${m}">${m}</button>`).join('')}</div>
       <button class="cancel" id="estDiscard" style="margin-top:8px">Discard</button>
     </div>
@@ -1822,6 +1872,12 @@ function estimateFromInput(){
 $('estGo').onclick = estimateFromInput;
 $('estQ').addEventListener('keydown', (e) => { if (e.key === 'Enter'){ e.preventDefault(); estimateFromInput(); } });
 
+$('estResult').addEventListener('change', (ev) => {
+  if (ev.target.id !== 'estDayPick') return;
+  const v = ev.target.value;
+  if (v && v <= todayKey()) estDay = v;
+  renderEst();
+});
 $('estResult').addEventListener('click', (ev) => {
   if (!est || est.error) return;
   const alt = ev.target.closest('[data-alt]');
@@ -1854,13 +1910,14 @@ $('estResult').addEventListener('click', (ev) => {
   const lt = ev.target.closest('[data-logto]');
   if (lt){
     const n = nutritionFor(est), meal = lt.dataset.logto;
-    db.entries.push({ id: uid(), day: todayKey(), meal, foodId: `${est.kind}:${est.id}`, name: n.name,
+    saveDish(est);
+    db.entries.push({ id: uid(), day: estDay, meal, foodId: `${est.kind}:${est.id}`, name: n.name,
       unit: est.label.replace(' · a usual serving', ''), qty: 1, kcal: r0(n.kcal), p: r1(n.p), c: r1(n.c), f: r1(n.f), t: Date.now() });
     const h = db.searches.find(x => x.id === est.histId);
     if (h) h.logged = meal;
     est = null; $('estQ').value = '';
     save(); renderEst(); renderHistory();
-    return toast(`Logged to today's ${meal}`);
+    return toast(`Logged to ${meal} · ${dayLabel(estDay)}`);
   }
   if (ev.target.closest('#estDiscard')){
     est = null; $('estQ').value = '';
@@ -1905,6 +1962,7 @@ $('histList').addEventListener('click', (ev) => {
     const h = db.searches.find(x => x.id === b.dataset.hist);
     const [kind, id] = h.ref.split(':');
     est = { kind, id, grams: h.grams, pieces: h.pieces, servings: h.servings, label: h.label, q: h.q, parsed: parseQuery(h.q), alts: [], histId: h.id };
+    estDay = todayKey();
     $('estQ').value = h.q;
     renderEst();
     $('estResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1981,8 +2039,17 @@ function renderMe(){
   $('myFoods').innerHTML = db.foods.length
     ? db.foods.map(f => `<button class="frow" data-myfood="${esc(f.id)}"><span><span class="fn">${esc(f.name)}</span><span class="fu">${esc(f.unit)}</span></span><span class="fk">${fmt(f.kcal)} kcal<br><b>${r1(f.p)} g protein</b></span></button>`).join('')
     : `<p class="empty">Foods you add yourself show up here, like your mom's dal or a protein bar you buy. Add them from the Log food screen.</p>`;
+  const sd = savedDishFoods();
+  $('savedDishes').innerHTML = sd.length ? `<div class="flist"><div class="grp">From your searches</div>${sd.map(f => `
+    <div class="hrow"><span class="hmain"><span class="hn">${esc(f.name)}</span><span class="hs">${esc(f.unit)} · ${fmt(f.kcal)} kcal · ${r1(f.p)} g protein</span></span>
+      <button class="hx" data-sddel="${esc(f.id.slice(3))}" aria-label="Remove from menu">✕</button></div>`).join('')}</div>` : '';
   renderBanners();
 }
+$('savedDishes').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-sddel]'); if (!b) return;
+  db.dishes = db.dishes.filter(d => d.id !== b.dataset.sddel);
+  save(); renderMe(); toast('Removed from the Log food menu');
+});
 
 const DAY = 86400000;
 const hasData = () => db.entries.length > 0 || db.weights.length > 1;
@@ -2163,6 +2230,7 @@ function render(){
   $('dayNav').hidden = tab !== 'today';
   viewingToday = day === todayKey();
   $('dayLabel').textContent = dayLabel(day);
+  $('dayPick').max = todayKey(); $('dayPick').value = day;
   $('nextDay').disabled = day >= todayKey();
   if (tab === 'today') renderToday();
   if (tab === 'progress') renderProgress();
