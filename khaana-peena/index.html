@@ -439,10 +439,10 @@
     <section>
       <h2>What should I get cooked?</h2>
       <p class="meta" style="margin:-6px 0 12px">Type a dish and roughly how much, e.g. <b>kabuli chana 250 g</b>, <b>2 roti</b>, <b>rajma 100 g dry</b> or <b>1 katori dal</b>. Estimates are home-style and follow your kitchen notes.</p>
-      <form class="est-form" id="estForm" autocomplete="off">
-        <input class="txt" id="estQ" list="dishList" placeholder="kabuli chana 250 g" enterkeyhint="search" aria-label="Dish and amount">
-        <button type="submit">Estimate</button>
-      </form>
+      <div class="est-form">
+        <input class="txt" id="estQ" list="dishList" placeholder="kabuli chana 250 g" enterkeyhint="search" autocomplete="off" aria-label="Dish and amount">
+        <button type="button" id="estGo">Estimate</button>
+      </div>
       <datalist id="dishList"></datalist>
       <div id="estResult"></div>
       <details class="card hist" id="estHistory">
@@ -810,6 +810,15 @@ function dayLabel(k){
   if (k === t) return 'Today';
   if (k === shiftDay(t, -1)) return 'Yesterday';
   return parseDay(k).toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' });
+}
+// Tap-twice confirmation: the first tap asks, a second tap within 3 s confirms.
+// Used instead of confirm(), which embedded previews silently block.
+function armed(btn, prompt){
+  if (btn.dataset.armed){ delete btn.dataset.armed; return true; }
+  const old = btn.textContent;
+  btn.dataset.armed = '1'; btn.textContent = prompt;
+  setTimeout(() => { if (btn.dataset.armed){ delete btn.dataset.armed; btn.textContent = old; } }, 3000);
+  return false;
 }
 function toast(msg){
   const t = $('toast');
@@ -1208,7 +1217,7 @@ $('fSave').onclick = () => {
   } else { closeSheets(); render(); }
 };
 $('fDelete').onclick = () => {
-  if (!editingFood || !confirm(`Delete “${editingFood.name}”? Past log entries stay as they are.`)) return;
+  if (!editingFood || !armed($('fDelete'), 'Tap again to delete. Past entries stay')) return;
   db.foods = db.foods.filter(x => x.id !== editingFood.id);
   save(); closeSheets(); render();
 };
@@ -1803,13 +1812,15 @@ function renderEst(){
   </div>`;
 }
 
-$('estForm').addEventListener('submit', (ev) => {
-  ev.preventDefault();
+// a plain button + Enter key rather than a <form>, which sandboxed previews refuse to submit
+function estimateFromInput(){
   const v = $('estQ').value.trim();
-  if (!v) return;
+  if (!v) return toast('Type a dish, e.g. kabuli chana 250 g');
   $('estQ').blur();
   runEstimate(v);
-});
+}
+$('estGo').onclick = estimateFromInput;
+$('estQ').addEventListener('keydown', (e) => { if (e.key === 'Enter'){ e.preventDefault(); estimateFromInput(); } });
 
 $('estResult').addEventListener('click', (ev) => {
   if (!est || est.error) return;
@@ -1886,7 +1897,7 @@ $('histList').addEventListener('click', (ev) => {
     save(); return renderHistory();
   }
   if (ev.target.closest('#histClear')){
-    if (!confirm('Clear all past searches?')) return;
+    if (!armed(ev.target.closest('#histClear'), 'Tap again to clear all past searches')) return;
     db.searches = []; est = null; save(); renderEst(); return renderHistory();
   }
   const b = ev.target.closest('[data-hist]');
@@ -1926,7 +1937,7 @@ $('noteSave').onclick = () => {
 };
 $('notesList').addEventListener('click', (ev) => {
   const b = ev.target.closest('[data-notedel]'); if (!b) return;
-  if (!confirm('Delete this note? Anything it changed goes back to the default.')) return;
+  if (!armed(b, 'Tap again to delete')) return;
   db.notes = db.notes.filter(n => n.id !== b.dataset.notedel);
   save(); render();
 });
@@ -2067,7 +2078,7 @@ $('importFile').onchange = (ev) => {
   ev.target.value = '';
 };
 $('resetBtn').onclick = () => {
-  if (!confirm('Erase all your logs, weights and settings from this phone? This cannot be undone.')) return;
+  if (!armed($('resetBtn'), 'Tap again to erase everything. This cannot be undone')) return;
   db = emptyDb(); est = null;
   ls.del(KEY); idb.set(KEY, null); boot();
 };
@@ -2195,7 +2206,7 @@ function boot(){
     document.head.appendChild(apple);
   } catch(e){}
   // ask the browser not to clear this app's storage when the phone is low on space
-  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch(e){}
 })();
 
 boot();
