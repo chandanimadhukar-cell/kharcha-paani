@@ -194,6 +194,49 @@
   .target-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
   .target-grid .stat .s-v{font-size:24px}
 
+  /* dish estimator */
+  .est-form{display:flex;gap:8px}
+  .est-form input{flex:1;min-width:0}
+  .est-form button{background:var(--ink);color:#fff;border-radius:11px;padding:0 16px;font-weight:600;font-size:14px}
+  .est-card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:16px;margin-top:14px}
+  .est-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .est-name{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:600;line-height:1.2}
+  .est-amt{font-size:12.5px;color:var(--ink-soft);margin-top:3px}
+  .est-big{display:flex;gap:26px;margin:16px 0 12px}
+  .est-big b{display:block;font-family:'Fraunces',Georgia,serif;font-size:34px;line-height:1;font-weight:400;font-variant-numeric:tabular-nums}
+  .est-big b.pro{color:var(--protein)}
+  .est-big span{font-size:12px;color:var(--ink-soft)}
+  .est-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .est-grid div{background:var(--paper);border-radius:10px;padding:8px 10px;font-size:11.5px;color:var(--ink-soft)}
+  .est-grid b{display:block;font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .est-p{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px;line-height:1.55}
+  .est-p b{color:var(--ink)}
+  .est-day{border-top:1px solid var(--rule-soft);padding-top:12px;margin:12px 0}
+  .est-day .meter{margin-top:10px}
+  .est-day .meter-head{font-size:13px}
+  .est-actions{border-top:1px solid var(--rule-soft);padding-top:12px;margin-top:12px}
+  .est-actions .flabel{font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;font-weight:500}
+  .est-actions .chips{gap:6px}
+  .est-actions .chip{padding:8px 12px;font-size:13.5px}
+  .alt-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+  .hist{margin-top:14px}
+  .hrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule-soft)}
+  .hrow:last-child{border-bottom:none}
+  .hrow .hmain{flex:1;min-width:0;text-align:left}
+  .hrow .hn{font-size:14px;color:var(--ink)}
+  .hrow .hs{display:block;font-size:12px;color:var(--ink-soft);margin-top:2px;font-variant-numeric:tabular-nums}
+  .hrow .hx{flex:none;width:30px;height:30px;border-radius:999px;color:var(--ink-soft);font-size:13px}
+  .tagl{font-size:10.5px;padding:1px 7px;border-radius:999px;background:var(--leaf-soft);color:var(--leaf);font-weight:600;margin-left:6px;white-space:nowrap}
+  /* notes */
+  .note-in{width:100%;min-height:84px;resize:vertical;border:1px solid var(--rule);background:var(--card);border-radius:11px;padding:12px;font:inherit;font-size:15px}
+  .note{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .note-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11.5px;color:var(--ink-soft)}
+  .note-top button{color:var(--ink-soft);font-size:12px;text-decoration:underline;padding:0}
+  .note-text{font-size:14.5px;margin:4px 0 8px;white-space:pre-wrap;word-break:break-word}
+  .note-hits{display:flex;flex-wrap:wrap;gap:6px}
+  .hit{font-size:11.5px;padding:3px 8px;border-radius:8px;background:var(--leaf-soft);color:var(--leaf);line-height:1.35}
+  .hit.none{background:var(--rule-soft);color:var(--ink-soft)}
+
   /* onboarding */
   .onboard{position:fixed;inset:0;z-index:70;background:var(--paper);overflow:auto;padding:calc(28px + env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom))}
   .onboard .inner{max-width:560px;margin:0 auto}
@@ -216,9 +259,13 @@
     transition:transform .26s cubic-bezier(.2,.8,.25,1),visibility 0s .26s;max-width:640px;margin:0 auto;visibility:hidden;
   }
   .sheet.open{transform:translateY(0);visibility:visible;transition:transform .26s cubic-bezier(.2,.8,.25,1)}
-  .grab{width:38px;height:4px;border-radius:2px;background:var(--rule);margin:8px auto 14px}
-  .sheet h3{margin:0 0 14px;font-size:17px;font-family:'Fraunces',Georgia,serif;font-weight:600}
-  .search{position:sticky;top:-8px;background:var(--paper);padding:6px 0 10px;z-index:2}
+  .grab{width:38px;height:4px;border-radius:2px;background:var(--rule);margin:0 auto 12px}
+  .sheet h3{margin:0;font-size:17px;font-family:'Fraunces',Georgia,serif;font-weight:600}
+  .sheet-top{position:sticky;top:-8px;z-index:3;background:var(--paper);margin:0 -18px 12px;padding:8px 18px 10px;touch-action:pan-x}
+  .sheet-title{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .sheet-top .chips{margin-top:12px}
+  .sheet-top .txt{margin-top:10px}
+  .x-close{flex:none;height:34px;padding:0 14px;border-radius:999px;background:var(--ink);color:#fff;font-size:13.5px;font-weight:600}
   .flist{margin:0 0 12px}
   .flist .grp{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;padding:12px 0 4px}
   .frow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 0;border-bottom:1px solid var(--rule-soft)}
@@ -390,13 +437,29 @@
       <div id="insights"></div>
     </section>
     <section>
-      <h2>Best protein for your diet</h2>
-      <p class="meta" style="margin:-6px 0 12px">Protein per 100 calories. The higher the number, the more protein you get without many extra calories.</p>
-      <div id="proteinPicks"></div>
+      <h2>What should I get cooked?</h2>
+      <p class="meta" style="margin:-6px 0 12px">Type a dish and roughly how much, e.g. <b>kabuli chana 250 g</b>, <b>2 roti</b>, <b>rajma 100 g dry</b> or <b>1 katori dal</b>. Estimates are home-style and follow your kitchen notes.</p>
+      <form class="est-form" id="estForm" autocomplete="off">
+        <input class="txt" id="estQ" list="dishList" placeholder="kabuli chana 250 g" enterkeyhint="search" aria-label="Dish and amount">
+        <button type="submit">Estimate</button>
+      </form>
+      <datalist id="dishList"></datalist>
+      <div id="estResult"></div>
+      <details class="card hist" id="estHistory">
+        <summary id="histSummary">Past searches</summary>
+        <div id="histList"></div>
+      </details>
     </section>
     <section>
       <h2>The basics</h2>
       <div id="basics"></div>
+    </section>
+    <section>
+      <h2>Notes about how you eat</h2>
+      <p class="meta" style="margin:-6px 0 12px">Tell the app about your kitchen and habits, e.g. <i>“All food gets cooked in groundnut oil”</i>, <i>“We use very little oil”</i>, <i>“1 tsp ghee on each roti”</i>, <i>“No sugar in chai”</i>, <i>“Our katori is 200 ml”</i>, <i>“I skip breakfast”</i>, <i>“I don't like mushrooms”</i>, <i>“I go to the gym in the evening”</i>. Notes it understands change the numbers and insights from now on. Food you've already logged keeps its numbers.</p>
+      <textarea class="note-in" id="noteIn" maxlength="400" placeholder="Write a note…"></textarea>
+      <button class="save" id="noteSave" style="margin-top:8px">Save note</button>
+      <div id="notesList"></div>
     </section>
   </div>
 
@@ -451,10 +514,12 @@
 
 <!-- add food -->
 <div class="sheet" id="addSheet" role="dialog" aria-modal="true" aria-label="Log food">
-  <div class="grab"></div>
-  <h3 id="addTitle">Log food</h3>
-  <div class="chips" id="mealChips" style="margin-bottom:10px"></div>
-  <div class="search"><input class="txt" id="q" placeholder="Search: roti, dal, paneer, egg…" autocomplete="off"></div>
+  <div class="sheet-top">
+    <div class="grab"></div>
+    <div class="sheet-title"><h3 id="addTitle">Log food</h3><button class="x-close" data-close aria-label="Close">Done</button></div>
+    <div class="chips" id="mealChips"></div>
+    <input class="txt" id="q" placeholder="Search: roti, dal, paneer, egg…" autocomplete="off">
+  </div>
   <div class="flist" id="flist"></div>
   <button class="ghost" id="newFoodBtn" style="margin-bottom:14px">+ Add a food that's not listed</button>
   <div class="picked" id="picked" hidden>
@@ -474,8 +539,10 @@
 
 <!-- entry detail -->
 <div class="sheet" id="entrySheet" role="dialog" aria-modal="true" aria-label="Food entry">
-  <div class="grab"></div>
-  <h3 id="eName"></h3>
+  <div class="sheet-top">
+    <div class="grab"></div>
+    <div class="sheet-title"><h3 id="eName"></h3><button class="x-close" data-close aria-label="Close">Close</button></div>
+  </div>
   <div class="field">
     <span class="flabel">Quantity</span>
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
@@ -499,9 +566,11 @@
 
 <!-- custom food -->
 <div class="sheet" id="foodSheet" role="dialog" aria-modal="true" aria-label="Add a food">
-  <div class="grab"></div>
-  <h3 id="fTitle">Add a food</h3>
-  <p class="meta" style="margin:-6px 0 16px">Copy the numbers from the packet label, or look the food up once. It's saved for next time.</p>
+  <div class="sheet-top">
+    <div class="grab"></div>
+    <div class="sheet-title"><h3 id="fTitle">Add a food</h3><button class="x-close" data-close aria-label="Close">Close</button></div>
+  </div>
+  <p class="meta" style="margin:0 0 16px">Copy the numbers from the packet label, or look the food up once. It's saved for next time.</p>
   <div class="field"><label for="fName">Name</label><input class="txt" id="fName" placeholder="Mom's rajma chawal" maxlength="40" autocomplete="off"></div>
   <div class="field"><label for="fUnit">One serving is</label><input class="txt" id="fUnit" placeholder="1 plate / 1 bar / 100 g" maxlength="30" autocomplete="off"></div>
   <div class="row2">
@@ -668,7 +737,8 @@ const DIET_NAME = { vegan:'Vegan', veg:'Vegetarian', egg:'Eggetarian', nonveg:'N
 const GOAL_NAME = { lose:'Lose fat', recomp:'Lose fat + build muscle', gain:'Build muscle', maintain:'Just eat better' };
 const ACT_NAME = { '1.2':'Mostly sitting', '1.375':'Lightly active', '1.55':'Active', '1.725':'Very active' };
 
-let db = { profile: null, targets: null, manual: false, entries: [], water: {}, weights: [], foods: [], lastBackup: 0 };
+const emptyDb = () => ({ profile: null, targets: null, manual: false, entries: [], water: {}, weights: [], foods: [], notes: [], searches: [], lastBackup: 0 });
+let db = emptyDb();
 
 function loadFrom(raw){
   try {
@@ -682,6 +752,8 @@ function loadFrom(raw){
       water: p.water && typeof p.water === 'object' ? p.water : {},
       weights: Array.isArray(p.weights) ? p.weights : [],
       foods: Array.isArray(p.foods) ? p.foods : [],
+      notes: Array.isArray(p.notes) ? p.notes : [],
+      searches: Array.isArray(p.searches) ? p.searches : [],
       lastBackup: p.lastBackup || 0
     };
   } catch(e){ return null; }
@@ -700,6 +772,10 @@ function mergeInto(target, incoming){
   Object.entries(incoming.water).forEach(([d, n]) => { if (+n > (target.water[d] || 0)){ target.water[d] = +n; changed = true; } });
   const fids = new Set(target.foods.map(f => f.id));
   incoming.foods.forEach(f => { if (f && f.id && !fids.has(f.id)){ target.foods.push(f); fids.add(f.id); changed = true; } });
+  [['notes', x => x && x.id && x.text], ['searches', x => x && x.id && x.ref]].forEach(([key, ok]) => {
+    const have = new Set(target[key].map(x => x.id));
+    incoming[key].forEach(x => { if (ok(x) && !have.has(x.id)){ target[key].push(x); have.add(x.id); changed = true; } });
+  });
   if (!target.profile && incoming.profile && incoming.targets){
     target.profile = incoming.profile; target.targets = incoming.targets; target.manual = incoming.manual; changed = true;
   }
@@ -708,6 +784,7 @@ function mergeInto(target, incoming){
 }
 
 function save(){
+  K = null;   // notes may have changed; re-read them on next use
   const json = JSON.stringify(db);
   ls.set(KEY, json);
   idb.set(KEY, json);
@@ -747,11 +824,122 @@ function mealForNow(){
   return 'Dinner';
 }
 
+/* ============ kitchen notes ============
+   Notes are read, oldest first, for patterns the app understands; a later note
+   overrides an earlier one on the same topic. Everything else is kept as context. */
+let K = null;
+const kitchen = () => K || (K = readKitchen());
+const WORDNUM = { half: 0.5, '½': 0.5, one: 1, two: 2, three: 3, four: 4 };
+const toNum = (w) => WORDNUM[w] ?? parseFloat(w);
+const HEALTH = [[/\bpco[sd]\b/, 'PCOS'], [/diabet|blood sugar|insulin/, 'diabetes / blood sugar'], [/thyroid/, 'thyroid'],
+  [/kidney/, 'a kidney condition'], [/pregnan|breastfeed|lactating/, 'pregnancy / breastfeeding'],
+  [/blood pressure|\bbp\b|hypertension/, 'blood pressure'], [/cholesterol/, 'cholesterol']];
+const AVOID_STOP = new Set(['oil','sugar','dairy','milk products','breakfast','lunch','dinner','snacks','snack','it','that','this','food','anything','much','outside food','junk']);
+
+function readKitchen(){
+  const k = { oilFactor: 1, oilLabel: '', oilType: '', katori: 150, rotiGhee: null, sugarTsp: null, milk: '',
+              skip: [], avoid: [], lactose: false, health: [], workout: '', byNote: {} };
+  [...db.notes].sort((a, b) => a.t - b.t).forEach(n => {
+    const s = ' ' + n.text.toLowerCase().replace(/[’`]/g, "'") + ' ';
+    const hits = [];
+    let m;
+    // how much oil
+    if (/\b(no|zero|without)\s+oil\b|\boil[- ]free\b/.test(s)){ k.oilFactor = 0.25; k.oilLabel = 'almost no oil'; hits.push('Oil: almost none in home-cooked dishes'); }
+    else if (/\b(very little|very less|minimal|barely any|hardly any)\s+oil\b/.test(s)){ k.oilFactor = 0.5; k.oilLabel = 'very little oil'; hits.push('Oil: half the usual amount in home-cooked dishes'); }
+    else if (/\b(less|little|low|not much|limited|light)\s+oil\b|\boil\b[^.]{0,25}\b(less|little|low|minimum|minimal)\b/.test(s)){ k.oilFactor = 0.7; k.oilLabel = 'less oil'; hits.push('Oil: about 30% less than usual in home-cooked dishes'); }
+    else if (/\b(lots? of|a lot of|extra|heavy|more|plenty of|generous)\s+oil\b|\boily\b/.test(s)){ k.oilFactor = 1.5; k.oilLabel = 'more oil'; hits.push('Oil: about 50% more than usual in home-cooked dishes'); }
+    // which oil
+    const roti = /\b(roti|rotis|chapati|chapatis|chapathi|phulka|phulkas)\b/.test(s);
+    if ((m = s.match(/\b(groundnut|peanut|mustard|coconut|sunflower|olive|rice ?bran|sesame|til|soybean|soya|canola|cottonseed|refined|palm)\s+oil\b/))){
+      k.oilType = m[1] + ' oil';
+      hits.push(`Cooking fat: ${m[1]} oil. Same calories as any oil (about 9 kcal per gram); the amount matters more than the type`);
+    } else if (!roti && /\b(cook|cooked|cooking|made|make|fry|fried|tadka|tempering)\b[^.]{0,40}\b(ghee|butter)\b|\b(ghee|butter)\b[^.]{0,20}\b(for cooking|to cook)\b/.test(s)){
+      k.oilType = 'ghee';
+      hits.push('Cooking fat: ghee. Same calories as oil, more saturated fat');
+    }
+    // katori size
+    if ((m = s.match(/katori[^.\d]{0,30}(\d{2,3})\s*(ml|g|gm|gms|grams?)\b/) || s.match(/(\d{2,3})\s*(ml|g|gm|gms|grams?)\s*(katori|bowl)/))){
+      const v = Math.max(60, Math.min(400, +m[1]));
+      k.katori = v; hits.push(`Katori size: ${v} ml (the app's default is 150 ml)`);
+    }
+    // ghee on roti
+    if (roti){
+      if (/\b(no|without|dry|plain|zero)\s+(any\s+)?(ghee|butter|oil)\b|\b(ghee|butter)[- ]free\b/.test(s)){ k.rotiGhee = 0; hits.push('Rotis: no ghee on top'); }
+      else if (/\b(ghee|butter)\b/.test(s)){
+        m = s.match(/(\d+(?:\.\d+)?|half|½|one|two)\s*(tsp|teaspoons?|spoons?|chammach|chamach)/);
+        k.rotiGhee = m ? Math.min(3, toNum(m[1])) : 1;
+        hits.push(`Rotis: about ${fmtQty(k.rotiGhee)} tsp ghee each (+${r0(45 * k.rotiGhee)} kcal per roti)`);
+      }
+    }
+    // sugar in chai / coffee
+    if (/\b(chai|tea|coffee)\b/.test(s)){
+      if (/\b(no|without|zero)\s+(any\s+)?sugar\b|\bsugar[- ]free\b|\bsugarless\b|\bunsweetened\b/.test(s)){ k.sugarTsp = 0; hits.push('Chai/coffee: no sugar'); }
+      else if ((m = s.match(/(\d+(?:\.\d+)?|half|½|one|two|three)\s*(tsp|teaspoons?|spoons?|chammach|chamach)\b[^.]{0,20}\b(sugar|jaggery|gud|honey)/)
+               || s.match(/\b(?:sugar|jaggery|gud)\b[^.]{0,15}?(\d+(?:\.\d+)?|half|½|one|two|three)\s*(tsp|teaspoons?|spoons?)/))){
+        k.sugarTsp = Math.min(6, toNum(m[1])); hits.push(`Chai/coffee: ${fmtQty(k.sugarTsp)} tsp sugar per cup (the app's default is 1.5)`);
+      }
+    }
+    // milk
+    if (/\b(full[- ]cream|full[- ]fat|whole|buffalo)\s+milk\b/.test(s)){ k.milk = 'full'; hits.push('Milk: full cream (about 45% more calories than toned)'); }
+    else if (/\b(skimmed|skim|double[- ]toned|low[- ]fat|fat[- ]free)\s+milk\b/.test(s)){ k.milk = 'skim'; hits.push('Milk: skimmed / double toned (about 40% fewer calories than toned)'); }
+    else if (/\btoned milk\b/.test(s)){ k.milk = 'toned'; hits.push('Milk: toned (the app\'s default)'); }
+    // skipped meals
+    MEALS.forEach(meal => {
+      const w = meal.toLowerCase().replace(/s$/, 's?');
+      if (new RegExp(`\\b(skip|skips|skipping|don't (eat|have)|dont (eat|have)|do not (eat|have)|never (eat|have)|no)\\s+(my\\s+)?${w}\\b`).test(s) && !k.skip.includes(meal)){
+        k.skip.push(meal); hits.push(`Skips ${meal.toLowerCase()}: it won't be flagged as a low-protein meal`);
+      }
+    });
+    // dairy
+    if (/lactose|dairy[- ]free|\bno dairy\b|avoid dairy|(allergic|allergy) to (milk|dairy)/.test(s)){ k.lactose = true; hits.push('No dairy: left out of food suggestions'); }
+    // foods to avoid
+    const avoidRe = /\b(allergic to|allergy to|don't like|dont like|do not like|hate|dislike|avoid|can't eat|cant eat|cannot eat|don't eat|dont eat|do not eat)\s+([a-z ,&\-]+)/g;
+    const found = [];
+    while ((m = avoidRe.exec(s))){
+      m[2].split(/\b(?:so|because|but|as|since|anymore|at all|on|in|at|during|after|before|when|much)\b/)[0]
+        .split(/,|&|\band\b|\bor\b/).map(x => x.replace(/\b(the|any|eating|to eat|my)\b/g, '').trim())
+        .filter(x => x.length >= 3 && !AVOID_STOP.has(x) && !MEALS.some(ml => ml.toLowerCase() === x))
+        .forEach(x => { if (!k.avoid.includes(x)){ k.avoid.push(x); found.push(x); } });
+    }
+    if (found.length) hits.push(`Won't suggest: ${found.join(', ')}`);
+    // health
+    HEALTH.forEach(([re, label]) => { if (re.test(s)){ if (!k.health.includes(label)) k.health.push(label); hits.push(`Health: ${label}. See the note in insights`); } });
+    // workout timing
+    if (/\b(gym|workout|work out|train|training|exercise|run|running|yoga|walk|walking|sports?|badminton|swim|swimming)\b/.test(s) && (m = s.match(/\b(morning|afternoon|evening|night)\b/))){
+      k.workout = m[1]; hits.push(`Works out in the ${m[1]}`);
+    }
+    k.byNote[n.id] = hits;
+  });
+  return k;
+}
+const avoided = (name) => { const n = name.toLowerCase(); return kitchen().avoid.some(a => n.includes(a) || n.includes(a.replace(/e?s$/, ''))); };
+
+// grams of oil per serving in home-cooked library foods, and ml of milk per serving
+const FOOD_OIL = { paratha:5, alooparatha:8, jeerarice:5, poha:7, upma:7, dosa:4, masaladosa:10, khichdi:5, vegpulao:8, dal:5, rajma:7,
+  chole:8, sambar:4, besanchilla:5, moongchilla:3, soyacurry:8, paneerbhurji:10, palakpaneer:10, omelette:7, eggbhurji:10, eggcurry:12,
+  chickencurry:12, fishcurry:10, mutton:14, prawns:8, sabzi:7, aloosabzi:8, bhindi:8, chickenbiryani:12 };
+const FOOD_MILK = { milk:250, chai:60, coffee:70, oatsmilk:200, coldcoffee:200 };
+const MILK_DELTA = { full: { kcal: 28, f: 3 }, skim: { kcal: -25, f: -2.9 } };   // per 100 ml vs toned
+
+function adjustFood(f){
+  const k = kitchen();
+  let { kcal, p, c } = f, fat = f.f, unit = f.unit, adj = false;
+  const katoriScale = unit.startsWith('1 katori') ? k.katori / 150 : 1;
+  if (katoriScale !== 1){ kcal *= katoriScale; p *= katoriScale; c *= katoriScale; fat *= katoriScale; unit = `1 katori (${k.katori} ml)`; adj = true; }
+  const oil = FOOD_OIL[f.id];
+  if (oil && k.oilFactor !== 1){ const d = oil * (k.oilFactor - 1) * katoriScale; kcal += d * 9; fat += d; adj = true; }
+  if (f.id === 'roti' && k.rotiGhee != null){ kcal = 105 + 45 * k.rotiGhee; fat = 1.5 + 5 * k.rotiGhee; adj = true; }
+  if ((f.id === 'chai' || f.id === 'coffee') && k.sugarTsp != null){ const d = k.sugarTsp - 1.5; kcal += d * 16; c += d * 4; adj = true; }
+  const ml = FOOD_MILK[f.id], md = MILK_DELTA[k.milk];
+  if (ml && md){ kcal += md.kcal * ml / 100; fat += md.f * ml / 100; adj = true; }
+  return adj ? { ...f, kcal: r0(Math.max(0, kcal)), p: r1(p), c: r1(Math.max(0, c)), f: r1(Math.max(0, fat)), unit, adj: true } : f;
+}
+
 /* ============ food lookup ============ */
 function allowedTypes(){ return DIET_TYPES[db.profile?.diet] || DIET_TYPES.nonveg; }
 function libraryFoods(){
   const types = allowedTypes();
-  const base = FOODS.filter(f => types.includes(f[7])).map(f => ({
+  const base = FOODS.filter(f => types.includes(f[7])).map(f => adjustFood({
     id: f[0], name: f[1], unit: f[2], kcal: f[3], p: f[4], c: f[5], f: f[6], type: f[7]
   }));
   const mine = db.foods.map(f => ({ ...f, mine: true }));
@@ -882,7 +1070,7 @@ function recentFoodIds(){
 
 function foodRow(f){
   return `<button class="frow" data-food="${esc(f.id)}" aria-pressed="${picked && picked.id === f.id}">
-    <span><span class="fn">${esc(f.name)}</span><span class="fu">${esc(f.unit)}${f.mine ? ' · my food' : ''}</span></span>
+    <span><span class="fn">${esc(f.name)}</span><span class="fu">${esc(f.unit)}${f.mine ? ' · my food' : ''}${f.adj ? ' · adjusted to your notes' : ''}</span></span>
     <span class="fk">${fmt(f.kcal)} kcal<br><b>${r1(f.p)} g protein</b></span>
   </button>`;
 }
@@ -1035,8 +1223,20 @@ function closeSheets(){
   document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
   $('scrim').classList.remove('open');
 }
-$('scrim').onclick = closeSheets;
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheets(); });
+// the custom-food sheet returns to the log sheet it was opened from
+const dismiss = () => { $('foodSheet').classList.contains('open') ? $('fCancel').onclick() : closeSheets(); };
+$('scrim').onclick = dismiss;
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
+document.addEventListener('click', (e) => { if (e.target.closest('[data-close]')) dismiss(); });
+// swipe down on the top of a sheet to close it
+document.querySelectorAll('.sheet-top').forEach(top => {
+  let y0 = null;
+  top.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; }, { passive: true });
+  top.addEventListener('touchend', (e) => {
+    if (y0 != null && e.changedTouches[0].clientY - y0 > 60) dismiss();
+    y0 = null;
+  });
+});
 
 /* ============ PROGRESS ============ */
 function lastNDays(n){ const t = todayKey(); return Array.from({ length: n }, (_, i) => shiftDay(t, i - n + 1)); }
@@ -1150,7 +1350,8 @@ function card(kind, pill, title, body){
 }
 
 function proteinDense(){
-  return libraryFoods().filter(f => !f.mine && f.p >= 3)
+  const k = kitchen();
+  return libraryFoods().filter(f => !f.mine && f.p >= 3 && !avoided(f.name) && !(k.lactose && f.type === 'd'))
     .map(f => ({ ...f, density: f.p / f.kcal * 100 }))
     .sort((a, b) => b.density - a.density);
 }
@@ -1160,6 +1361,21 @@ function renderLearn(){
   const days = lastNDays(7);
   const s = weekSummary(days);
   const out = [];
+  const k = kitchen();
+
+  // health conditions mentioned in notes come first
+  if (k.health.length){
+    const h = k.health;
+    const tips = [];
+    if (h.includes('a kidney condition')) tips.push('High-protein targets may not be right for kidney conditions. Ask your doctor what protein target is safe before following the one here.');
+    if (h.includes('pregnancy / breastfeeding')) tips.push('A calorie deficit is not advised during pregnancy or breastfeeding. Ask your doctor for your calorie target.');
+    if (h.includes('diabetes / blood sugar') || h.includes('PCOS')) tips.push('For steadier blood sugar, have protein and fibre (dal, sabzi, salad) at every meal, and keep sweets, juices and sugary chai for occasional treats.');
+    if (h.includes('thyroid')) tips.push('Thyroid conditions change how many calories you burn, so your weekly weight trend is a better guide than the estimate here.');
+    if (h.includes('blood pressure')) tips.push('Watch salt: pickles, papad, namkeen and packaged snacks add up quickly.');
+    if (h.includes('cholesterol')) tips.push('Prefer oil to ghee or butter for everyday cooking, and keep fried snacks occasional.');
+    out.push(card('warn', 'Health', `You mentioned ${h.join(', ')}`,
+      `<p>The targets in this app are general estimates. Please check them with your doctor or dietitian.</p>${tips.map(t => `<p>${t}</p>`).join('')}`));
+  }
 
   if (s.logged.length < 3){
     out.push(card('', 'Start here', 'Log for 3 days to unlock insights',
@@ -1183,7 +1399,7 @@ function renderLearn(){
     const mealP = MEALS.map(m => {
       const v = s.logged.reduce((sum, d) => sum + totals(entriesOn(d).filter(e => e.meal === m)).p, 0) / n;
       return [m, v];
-    }).filter(([m]) => m !== 'Snacks');
+    }).filter(([m]) => m !== 'Snacks' && !k.skip.includes(m));
     const weakest = mealP.sort((a, b) => a[1] - b[1])[0];
     if (weakest && weakest[1] < T.protein * 0.2){
       const ideas = {
@@ -1239,23 +1455,481 @@ function renderLearn(){
     out.push(card(kind, 'Weight', 'This week vs last week', `<p>${msg}</p>`));
   }
 
+  // workout timing from notes
+  if (k.workout){
+    const meal = { morning: 'Breakfast', afternoon: 'Lunch', evening: 'Dinner', night: 'Dinner' }[k.workout];
+    const n = s.logged.length;
+    const avg = n ? s.logged.reduce((sum, d) => sum + totals(entriesOn(d).filter(e => e.meal === meal)).p, 0) / n : 0;
+    const good = n >= 3 && avg >= T.protein * 0.3;
+    out.push(card(good ? 'good' : '', 'Workout', `You train in the ${k.workout}`,
+      `<p>${meal === 'Breakfast' ? 'Breakfast' : meal === 'Lunch' ? 'Lunch' : 'Dinner'} is your post-workout meal, so make it one of your most protein-rich meals (about ${r0(T.protein * 0.3)} g).${n >= 3 ? ` Right now it averages <b>${r0(avg)} g</b>.` : ''}</p>`));
+  }
+
   // streak
-  let streak = 0, k = t;
-  if (!entriesOn(k).length) k = shiftDay(k, -1);
-  while (entriesOn(k).length){ streak++; k = shiftDay(k, -1); }
+  let streak = 0, sk = t;
+  if (!entriesOn(sk).length) sk = shiftDay(sk, -1);
+  while (entriesOn(sk).length){ streak++; sk = shiftDay(sk, -1); }
   if (streak >= 2) out.push(card('good', 'Streak', `${streak} days logged in a row`, `<p>Logging consistently matters more than logging perfectly.</p>`));
+
+  // what the app has picked up from notes
+  const applied = db.notes.flatMap(n => k.byNote[n.id] || []);
+  if (db.notes.length){
+    const unread = db.notes.filter(n => !(k.byNote[n.id] || []).length).length;
+    out.push(card('', 'Your notes', `Using ${db.notes.length} note${db.notes.length === 1 ? '' : 's'}`,
+      `${applied.length ? `<ul>${[...new Set(applied)].map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
+       ${unread ? `<p>${unread} note${unread === 1 ? ' is' : 's are'} saved for context but not used in the numbers.</p>` : ''}`));
+  }
 
   $('insights').innerHTML = out.join('');
 
-  const picks = proteinDense().slice(0, 10);
-  $('proteinPicks').innerHTML = picks.map(f => `
-    <div class="frow" style="cursor:default">
-      <span><span class="fn">${esc(f.name)}</span><span class="fu">${esc(f.unit)} · ${f.kcal} kcal · ${r1(f.p)} g protein</span></span>
-      <span class="fk"><b>${r1(f.density)} g</b><br>per 100 kcal</span>
-    </div>`).join('');
+  $('dishList').innerHTML = DISHES.map(d => `<option value="${esc(d.name)}">`).join('') + db.foods.map(f => `<option value="${esc(f.name)}">`).join('');
+  renderEst();
+  renderHistory();
+  renderNotes();
 
   $('basics').innerHTML = BASICS.map(([q, a]) => `<details class="card"><summary>${q}</summary>${a}</details>`).join('');
 }
+
+/* ============ DISH ESTIMATOR ============
+   Values per 100 g of the dish as cooked at home. oil = grams of oil per 100 g,
+   s = default serving ('k' katori, 'p' one piece, or grams), dry = cooked grams per gram of dry legume/grain,
+   milk = ml of milk per 100 g, piece = grams per piece. */
+const DISHES = [];
+function D(id, name, aliases, [kcal, p, c, f, fib], o = {}){
+  DISHES.push({ id, name, aliases: aliases.split('|'), kcal, p, c, f, fib, oil: o.oil || 0, t: o.t || 'v', s: o.s ?? 'k',
+    piece: o.piece || 0, pieceName: o.pieceName || '', dry: o.dry || 0, milk: o.milk || 0, sugar: !!o.sugar, roti: !!o.roti, cup: o.cup || '',
+    tags: o.tags ? o.tags.split(',') : [] });
+}
+// legumes
+D('chole','Kabuli chana curry (chole)','kabuli chana|chole|chana masala|chickpea curry|chhole|safed chana|pindi chana|chickpeas curry',[150,7,20,5,6],{oil:3.5,dry:3,tags:'iron,folate,fibre'});
+D('chickpeas','Boiled kabuli chana (plain)','boiled chana|boiled chickpeas|chickpeas|boiled kabuli chana',[164,8.9,27,2.6,7.6],{s:100,dry:2.4,tags:'iron,folate,fibre'});
+D('chanachaat','Chana chaat','chana chaat|chickpea salad|chana salad',[140,7,22,2.5,6.5],{s:150,tags:'iron,folate,fibre'});
+D('rajma','Rajma curry','rajma|kidney beans|rajma masala',[130,6.5,17,4,5.5],{oil:3.5,dry:3,tags:'iron,folate,fibre'});
+D('kalachana','Kala chana curry','kala chana|black chana|black chickpeas|kale chane|chana',[140,7,19,4.5,6],{oil:3.5,dry:3,tags:'iron,folate,fibre'});
+D('lobia','Lobia curry','lobia|black eyed peas|chawli|rongi',[125,7,18,3.5,5],{oil:3,dry:3,tags:'iron,folate,fibre'});
+D('toordal','Toor / arhar dal','dal|daal|toor dal|arhar dal|tuvar dal|dal tadka|plain dal|yellow dal|dal fry',[95,5.5,13,2.8,3],{oil:2.5,dry:5,tags:'folate,fibre'});
+D('moongdal','Moong dal','moong dal|yellow moong|mung dal|moong',[90,5.5,12,2.5,3],{oil:2,dry:5,tags:'folate,fibre'});
+D('masoor','Masoor dal','masoor|masoor dal|red lentil|lal dal',[95,6,13,2.5,3],{oil:2,dry:5,tags:'iron,folate,fibre'});
+D('chanadal','Chana dal','chana dal|bengal gram dal',[110,6,15,3,4],{oil:2.5,dry:4.5,tags:'folate,fibre'});
+D('dalmakhani','Dal makhani','dal makhani|maa ki dal|kali dal|urad dal',[150,5.5,14,8,4],{oil:3,t:'d',tags:'iron,fibre'});
+D('sambar','Sambar','sambar|sambhar',[85,4,12,2.7,3],{oil:2.5,tags:'fibre'});
+D('sprouts','Moong sprouts','sprouts|sprouted moong|moong sprouts|sprout salad',[70,5,11,0.5,3.5],{s:100,tags:'folate,vitamin C,fibre'});
+D('soyacurry','Soya chunk curry','soya chunks|soya curry|soyabean curry|nutrela|meal maker|soya',[130,12,9,6,4],{oil:4,dry:4,tags:'iron,calcium,fibre'});
+D('tofubhurji','Tofu bhurji','tofu|tofu bhurji|tofu scramble',[150,12,5,9.5,1.5],{oil:4,s:100,tags:'calcium,iron'});
+// dairy
+D('paneer','Paneer (plain)','paneer|cottage cheese|raw paneer',[265,18,3.6,20.8,0],{t:'d',s:100,tags:'calcium'});
+D('paneerbhurji','Paneer bhurji','paneer bhurji',[200,11,5,15,1],{oil:4,t:'d',tags:'calcium'});
+D('palakpaneer','Palak paneer','palak paneer|saag paneer',[145,6.5,6,11,2],{oil:4,t:'d',tags:'calcium,iron,vitamin A'});
+D('matarpaneer','Matar paneer','matar paneer|mutter paneer|peas paneer',[160,7,9,11,2.5],{oil:5,t:'d',tags:'calcium'});
+D('paneerbutter','Paneer butter masala','paneer butter masala|shahi paneer|paneer makhani|kadai paneer',[230,8,9,18,1.5],{oil:6,t:'d',tags:'calcium'});
+D('curd','Curd (dahi)','curd|dahi|yogurt|yoghurt',[60,3.5,4.7,3.3,0],{t:'d',tags:'calcium,B12'});
+D('hungcurd','Hung curd / Greek yogurt','hung curd|greek yogurt|greek yoghurt',[100,9,4,5,0],{t:'d',s:100,tags:'calcium,B12'});
+D('raita','Raita','raita|boondi raita|cucumber raita',[60,3,5,3,0.5],{t:'d',tags:'calcium'});
+D('kadhi','Kadhi','kadhi|kadi|kadhi pakora',[90,3,8,5,0.5],{oil:2.5,t:'d',tags:'calcium'});
+D('milk','Milk (toned)','milk|doodh|glass of milk',[60,3.2,4.8,3,0],{t:'d',s:250,milk:100,cup:'glass',tags:'calcium,B12'});
+D('chai','Chai with milk & sugar','chai|tea|masala chai',[55,1.6,7.5,2,0],{t:'d',s:150,milk:50,sugar:true,cup:'cup'});
+D('coffee','Coffee with milk & sugar','coffee|filter coffee',[60,2,8,2.2,0],{t:'d',s:150,milk:60,sugar:true,cup:'cup'});
+D('lassi','Sweet lassi','lassi|sweet lassi',[90,3,14,2.5,0],{t:'d',s:250,cup:'glass',tags:'calcium'});
+D('chaas','Chaas / buttermilk','chaas|buttermilk|chhaas|mattha',[16,0.8,1.6,0.6,0],{t:'d',s:250,cup:'glass',tags:'calcium'});
+D('whey','Whey protein shake (1 scoop in water)','whey|protein shake|protein powder',[48,9.6,1.2,0.6,0],{t:'d',s:250,cup:'glass',tags:'B12'});
+// eggs
+D('egg','Boiled egg','egg|eggs|boiled egg|anda',[155,12.6,1.1,10.6,0],{t:'e',s:'p',piece:50,pieceName:'egg',tags:'B12,vitamin D,choline'});
+D('omelette','Omelette','omelette|omelet|masala omelette',[160,11,2,12,0.3],{oil:3,t:'e',s:120,piece:60,pieceName:'egg',tags:'B12,vitamin D'});
+D('eggbhurji','Egg bhurji','egg bhurji|scrambled eggs|anda bhurji',[170,10,4,13,0.8],{oil:4,t:'e',s:120,piece:60,pieceName:'egg',tags:'B12,vitamin D'});
+D('eggcurry','Egg curry','egg curry|anda curry',[150,8,5,11,1],{oil:4,t:'e',tags:'B12,vitamin D'});
+D('eggwhite','Egg whites (boiled)','egg white|egg whites',[52,11,0.7,0.2,0],{t:'e',s:'p',piece:33,pieceName:'white'});
+// meat & fish
+D('chickencurry','Chicken curry','chicken curry|chicken gravy|murgh curry|chicken masala',[150,14,4,8.5,1],{oil:4,t:'n',tags:'B12,niacin'});
+D('chickenbreast','Chicken breast, grilled','chicken|chicken breast|grilled chicken|boiled chicken',[165,31,0,3.6,0],{t:'n',s:100,tags:'B12,niacin'});
+D('butterchicken','Butter chicken','butter chicken|murgh makhani',[200,14,6,13,1],{oil:5,t:'n',tags:'B12'});
+D('tandoori','Tandoori chicken','tandoori chicken|chicken tikka',[175,23,3,8,0.5],{oil:2,t:'n',s:150,piece:75,tags:'B12,niacin'});
+D('chickenbiryani','Chicken biryani','chicken biryani|biryani',[170,8,20,6.5,1],{oil:3.5,t:'n',s:300,tags:'B12'});
+D('mutton','Mutton curry','mutton|mutton curry|goat curry|lamb curry',[200,14,4,14,1],{oil:5,t:'n',tags:'iron,B12,zinc'});
+D('keema','Keema','keema|mince|kheema',[210,16,5,14,1.5],{oil:5,t:'n',tags:'iron,B12,zinc'});
+D('fishcurry','Fish curry','fish curry|fish|machli|machhi',[130,12,4,7,0.5],{oil:4,t:'n',tags:'omega-3,B12,vitamin D'});
+D('fishfry','Fish fry','fish fry|fried fish|tawa fish',[220,20,8,12,0.5],{oil:7,t:'n',s:'p',piece:80,tags:'omega-3,B12'});
+D('prawn','Prawn curry','prawn|prawns|shrimp|jhinga|prawn curry',[120,13,5,5.5,1],{oil:3.5,t:'n',tags:'B12,iodine'});
+// grains & breads
+D('rice','Rice, cooked','rice|chawal|plain rice|steamed rice|white rice',[130,2.7,28,0.3,0.4],{dry:3});
+D('brownrice','Brown rice, cooked','brown rice',[112,2.6,23,0.9,1.8],{dry:3,tags:'fibre'});
+D('jeerarice','Jeera rice','jeera rice|cumin rice',[150,2.8,27,3.5,0.5],{oil:3});
+D('pulao','Veg pulao','pulao|pulav|veg pulao',[140,3,23,4,1.5],{oil:3.5});
+D('vegbiryani','Veg biryani','veg biryani',[150,3.5,22,5,2],{oil:4,t:'d',s:300});
+D('khichdi','Khichdi','khichdi|khichri|dal khichdi',[115,4,19,2.5,2],{oil:2,s:250,tags:'fibre'});
+D('curdrice','Curd rice','curd rice|dahi chawal|thayir sadam',[125,3.5,19,4,0.5],{oil:1.5,t:'d',s:200,tags:'calcium'});
+D('lemonrice','Lemon rice','lemon rice|chitranna',[165,3,28,4.5,1],{oil:4,s:200});
+D('roti','Roti / chapati','roti|rotis|chapati|chapatis|phulka|fulka|chapathi',[265,9,50,3.5,5],{s:'p',piece:40,pieceName:'roti',roti:true,tags:'fibre'});
+D('paratha','Plain paratha','paratha|parantha|plain paratha',[320,7,45,12,5],{oil:8,s:'p',piece:65,pieceName:'paratha'});
+D('alooparatha','Aloo paratha','aloo paratha|alu paratha|potato paratha',[250,5.5,35,10,3.5],{oil:6,s:'p',piece:110,pieceName:'paratha'});
+D('paneerparatha','Paneer paratha','paneer paratha',[270,10,30,12.5,3],{oil:6,t:'d',s:'p',piece:120,pieceName:'paratha',tags:'calcium'});
+D('poha','Poha','poha|kanda poha|pohe',[135,2.5,23,3.8,1.5],{oil:3,s:200,tags:'iron'});
+D('upma','Upma','upma|uppittu|rava upma',[125,3,19,4,1.5],{oil:3.5,s:200});
+D('idli','Idli','idli|idly|idlis',[120,4,25,0.5,1.2],{s:'p',piece:40,pieceName:'idli'});
+D('dosa','Plain dosa','dosa|plain dosa|dosai',[200,4.5,30,6.5,1.2],{oil:4,s:'p',piece:85,pieceName:'dosa'});
+D('masaladosa','Masala dosa','masala dosa',[180,4,27,6.5,2],{oil:5,s:'p',piece:190,pieceName:'dosa'});
+D('uttapam','Uttapam','uttapam|uthappam',[160,4.5,26,4,2],{oil:3,s:'p',piece:150});
+D('besanchilla','Besan chilla','besan chilla|besan cheela|chilla|cheela|besan ka chilla',[190,9,21,8,4],{oil:5,s:'p',piece:75,pieceName:'chilla',tags:'folate,fibre'});
+D('moongchilla','Moong dal chilla','moong chilla|moong dal chilla|pesarattu|moong cheela',[160,9.5,18,5.5,3.5],{oil:3.5,s:'p',piece:80,pieceName:'chilla',tags:'folate,fibre'});
+D('oats','Oats with milk','oats|oatmeal|porridge|oats with milk',[110,5,14,3.5,1.5],{t:'d',s:250,milk:70,tags:'fibre,calcium'});
+D('dalia','Dalia (savoury)','dalia|daliya|broken wheat|lapsi',[90,3,16,1.5,2.5],{oil:1,s:250,tags:'fibre'});
+D('sabudana','Sabudana khichdi','sabudana|sago|sabudana khichdi',[200,2.5,30,8,1],{oil:5,s:200});
+D('bread','Brown bread','bread|brown bread|toast|whole wheat bread',[250,10,43,3.5,6],{s:'p',piece:28,pieceName:'slice',tags:'fibre'});
+D('pav','Pav','pav|bun|ladi pav',[275,8,50,4,2],{s:'p',piece:40,pieceName:'pav'});
+// vegetables
+D('mixveg','Mixed veg sabzi','sabzi|sabji|subzi|mix veg|mixed vegetable|mixed veg',[90,2.5,8,5.5,3],{oil:4.5,tags:'fibre,vitamin A'});
+D('aloosabzi','Aloo sabzi','aloo|alu|potato|aloo sabzi|jeera aloo',[120,2,15,6,2],{oil:4.5,tags:'potassium'});
+D('aloogobi','Aloo gobi','aloo gobi|gobi|cauliflower|gobhi',[95,2.5,10,5.5,3],{oil:4.5,tags:'vitamin C,fibre'});
+D('bhindi','Bhindi sabzi','bhindi|okra|lady finger|bhendi',[100,2.5,8,7,3.5],{oil:5.5,tags:'fibre,folate'});
+D('baingan','Baingan bharta','baingan|brinjal|eggplant|bharta|baingan bharta',[85,2,8,5.5,3.5],{oil:4.5,tags:'fibre'});
+D('palak','Palak / saag sabzi','palak|spinach|saag|sarson ka saag|methi',[80,3,6,5.5,3],{oil:4.5,tags:'iron,folate,vitamin A,calcium'});
+D('lauki','Lauki / tori sabzi','lauki|ghiya|bottle gourd|dudhi|tori|turai|tinda|zucchini',[55,1,5,3.5,2],{oil:3,tags:'fibre'});
+D('cabbage','Cabbage / beans sabzi','cabbage|patta gobi|beans|french beans|beans poriyal',[70,1.8,6,4.5,2.5],{oil:4,tags:'vitamin C,fibre'});
+D('aloomatar','Aloo matar','aloo matar|matar|peas|green peas',[110,3.5,14,5,4],{oil:4,tags:'fibre,folate'});
+D('mushroom','Mushroom masala','mushroom|mushrooms|khumb',[85,3.5,6,5.5,2],{oil:4.5,tags:'B vitamins'});
+D('salad','Salad (cucumber, tomato, onion)','salad|kachumber|cucumber',[20,1,4,0.2,1.5],{s:150,tags:'vitamin C'});
+D('pavbhaji','Pav bhaji (bhaji only)','pav bhaji|bhaji',[110,2.5,12,6,2.5],{oil:5,t:'d'});
+// snacks
+D('roastedchana','Roasted chana','roasted chana|bhuna chana|chana roasted|futana',[370,21,58,5,17],{s:30,tags:'iron,fibre'});
+D('peanuts','Peanuts, roasted','peanuts|groundnuts|moongphali|mungfali',[585,25,16,50,8],{s:30,tags:'niacin,magnesium'});
+D('almonds','Almonds','almonds|badam',[580,21,22,50,12],{s:15,tags:'vitamin E,magnesium'});
+D('makhana','Makhana, roasted','makhana|fox nuts|lotus seeds',[370,9.5,72,4,7],{s:30,tags:'magnesium'});
+D('dhokla','Dhokla','dhokla|khaman',[160,6,24,4.5,2],{oil:2,s:'p',piece:35});
+D('samosa','Samosa','samosa',[290,5,30,17,2.5],{s:'p',piece:90,pieceName:'samosa'});
+D('pakora','Pakora','pakora|pakoda|bhajiya',[290,7,25,18,4],{s:'p',piece:25});
+D('vadapav','Vada pav','vada pav|vadapav',[200,4,27,8.5,2],{s:'p',piece:150});
+D('maggi','Instant noodles','maggi|noodles|instant noodles',[124,2.8,18,4.8,1],{s:'p',piece:250,pieceName:'pack'});
+D('pizza','Pizza','pizza',[266,11,33,10,2],{t:'d',s:'p',piece:105,pieceName:'slice'});
+// fruit
+D('banana','Banana','banana|kela',[89,1.1,23,0.3,2.6],{s:'p',piece:120,pieceName:'banana',tags:'potassium'});
+D('apple','Apple','apple|seb',[52,0.3,14,0.2,2.4],{s:'p',piece:180,pieceName:'apple',tags:'fibre'});
+D('guava','Guava','guava|amrood|peru',[68,2.6,14,1,5.4],{s:'p',piece:120,tags:'vitamin C,fibre'});
+D('orange','Orange / mosambi','orange|santra|mosambi|sweet lime',[47,0.9,12,0.1,2.4],{s:'p',piece:150,tags:'vitamin C'});
+D('papaya','Papaya','papaya|papita',[43,0.5,11,0.3,1.7],{s:150,tags:'vitamin C,vitamin A'});
+D('mango','Mango','mango|aam',[60,0.8,15,0.4,1.6],{s:'p',piece:200,tags:'vitamin A,vitamin C'});
+D('watermelon','Watermelon','watermelon|tarbooz',[30,0.6,8,0.2,0.4],{s:200});
+// sweets
+D('kheer','Kheer','kheer|payasam|rice pudding',[140,4,20,5,0.3],{t:'d',milk:70,tags:'calcium'});
+D('halwa','Halwa','halwa|sheera|sooji halwa|suji halwa|gajar halwa',[330,4,45,15,1],{t:'d',s:100});
+D('gulabjamun','Gulab jamun','gulab jamun',[320,5,50,12,0.5],{t:'d',s:'p',piece:45});
+
+const squash = (x) => x.toLowerCase().replace(/[^a-z ]/g, ' ').replace(/ee/g, 'i').replace(/oo/g, 'u').replace(/ph/g, 'f')
+  .replace(/w/g, 'v').replace(/([a-z])\1+/g, '$1').replace(/\s+/g, ' ').trim();
+DISHES.forEach(d => { d.keys = [d.name, ...d.aliases].map(squash); });
+
+function matchDishes(q){
+  const qs = squash(q);
+  if (!qs) return [];
+  const qt = qs.split(' ').filter(w => w.length >= 2);
+  const cands = DISHES.map(d => ({ kind: 'dish', d, keys: d.keys }))
+    .concat(db.foods.map(f => ({ kind: 'mine', d: f, keys: [squash(f.name)] })));
+  return cands.map(c => {
+    let best = 0;
+    c.keys.forEach(k => {
+      let sc = 0;
+      if (k === qs) sc = 100;
+      else if (k.startsWith(qs) || (qs.length >= 4 && k.includes(qs))) sc = 80 - Math.min(20, k.length - qs.length);
+      else if (qs.includes(k) && k.length >= 3) sc = 60 + Math.min(15, k.length);
+      else {
+        const kt = k.split(' ');
+        const hit = qt.filter(w => kt.some(t => t === w || (w.length >= 3 && t.startsWith(w)) || (t.length >= 3 && w.startsWith(t)))).length;
+        sc = qt.length ? hit / Math.max(qt.length, kt.length) * 60 : 0;
+      }
+      best = Math.max(best, sc);
+    });
+    return { ...c, score: best + (c.kind === 'mine' ? 5 : 0) };
+  }).filter(c => c.score >= 30).sort((a, b) => b.score - a.score);
+}
+
+const UNIT_RE = /(?:^|\s)(\d+(?:\.\d+)?|\d+\/\d+|half|quarter|one|two|three|four|five|½|¼)\s*(kgs?|kilos?|grams?|gms?|gm|g|ml|litres?|liters?|l|katoris?|bowls?|cups?|glass(?:es)?|plates?|pieces?|pcs?|nos?|tbsp|tsp|spoons?|scoops?|slices?|packs?|packets?|rotis?|chapatis?|eggs?|idlis?|dosas?|parathas?)?(?=\s|$)/;
+const QWORDS = { half: 0.5, quarter: 0.25, one: 1, two: 2, three: 3, four: 4, five: 5, '½': 0.5, '¼': 0.25 };
+
+function parseQuery(text){
+  let t = ' ' + text.toLowerCase().replace(/,/g, ' ') + ' ';
+  const dry = /\b(dry|raw|uncooked|kachha|kaccha)\b/.test(t);
+  t = t.replace(/\b(dry|raw|uncooked|kachha|kaccha|cooked|of|approx|approximately|about|around|estimated|est)\b/g, ' ');
+  const m = t.match(UNIT_RE);
+  let n = null, unit = '';
+  if (m){
+    n = QWORDS[m[1]] ?? (m[1].includes('/') ? m[1].split('/').reduce((a, b) => +a / +b) : parseFloat(m[1]));
+    unit = (m[2] || '').replace(/(es|s)$/, '').replace(/^(gram|gm)$/, 'g').replace(/^(kilo|kg)$/, 'kg').replace(/^(litre|liter)$/, 'l');
+    t = t.replace(m[0], ' ');
+    // words like "rotis" or "eggs" are both the unit and the dish
+    if (/^(roti|chapati|egg|idli|dosa|paratha)$/.test(unit)) t += ' ' + unit;
+  }
+  return { q: t.replace(/\s+/g, ' ').trim(), n, unit, dry };
+}
+
+// Turns a parsed amount into cooked grams (or servings for your own foods) plus a readable label.
+function resolveAmount(c, { n, unit, dry }){
+  const k = kitchen();
+  if (c.kind === 'mine') return { servings: n || 1, label: `${fmtQty(n || 1)} × ${c.d.unit}` };
+  const d = c.d, pieceWord = (x) => `${fmtQty(x)} ${d.pieceName || 'piece'}${x === 1 ? '' : 's'}`;
+  const serveG = d.s === 'k' ? k.katori : d.s === 'p' ? (d.piece || 100) : d.s;
+  const serveLabel = d.s === 'k' ? `1 katori (${k.katori} ml)` : d.s === 'p' ? pieceWord(1) : d.cup ? `1 ${d.cup} (${d.s} ml)` : `${d.s} g`;
+  const g_ = (x) => `${fmt(x)} ${d.cup ? 'ml' : 'g'}`;
+  if (n == null) return { grams: serveG, pieces: d.s === 'p' ? 1 : null, label: `${serveLabel} · a usual serving` };
+  const per = { kg: 1000, g: 1, ml: 1, l: 1000, tbsp: 15, tsp: 5, spoon: 10, glass: 250, bowl: 250,
+                katori: k.katori, cup: d.sugar ? d.s : 200, plate: typeof d.s === 'number' && d.s >= 150 ? d.s : 250,
+                scoop: serveG }[unit];
+  if (per){
+    let g = n * per;
+    if (dry && d.dry && ['kg','g','katori','cup','bowl','tbsp','tsp','spoon'].includes(unit)){
+      const cooked = r0(g * d.dry / 5) * 5;
+      return { grams: cooked, pieces: null, label: `${fmtQty(g)} g dry → about ${cooked} g cooked`, dryG: g };
+    }
+    const label = unit === 'katori' ? `${fmtQty(n)} katori (${fmt(g)} ml)` : ['g','kg','ml','l'].includes(unit) ? `${fmt(g)} ${unit === 'ml' || unit === 'l' || d.cup ? 'ml' : 'g'}` : `${fmtQty(n)} ${unit}${n === 1 ? '' : 's'} (≈${g_(g)})`;
+    return { grams: g, pieces: null, label };
+  }
+  // no unit, or a count unit such as "pieces" / "rotis"
+  if (!unit && n > 12) return { grams: n, pieces: null, label: g_(n) };
+  if (d.piece) return { grams: n * d.piece, pieces: n, label: `${pieceWord(n)} (≈${fmt(n * d.piece)} g)` };
+  return { grams: n * serveG, pieces: null, label: `${fmtQty(n)} × ${serveLabel}` };
+}
+
+function dishNutrition(d, grams){
+  const k = kitchen(), r = grams / 100;
+  let kcal = d.kcal * r, p = d.p * r, c = d.c * r, f = d.f * r, fib = d.fib * r;
+  const oilBase = d.oil * r, oil = oilBase * k.oilFactor;
+  kcal += (oil - oilBase) * 9; f += oil - oilBase;
+  let ghee = 0;
+  if (d.roti && k.rotiGhee){ ghee = k.rotiGhee * 5 * grams / d.piece; kcal += ghee * 9; f += ghee; }
+  if (d.sugar && k.sugarTsp != null){ const tsp = (k.sugarTsp - 1.5) * grams / 150; kcal += tsp * 16; c += tsp * 4; }
+  const md = d.milk && MILK_DELTA[k.milk];
+  if (md){ kcal += md.kcal * d.milk / 100 * r; f += md.f * d.milk / 100 * r; }
+  return { kcal: Math.max(0, kcal), p, c: Math.max(0, c), f: Math.max(0, f), fib, oil, ghee };
+}
+
+function nutritionFor(st){
+  if (st.kind === 'mine'){
+    const f = db.foods.find(x => x.id === st.id);
+    if (!f) return null;
+    const m = st.servings;
+    return { name: f.name, kcal: f.kcal * m, p: f.p * m, c: (f.c || 0) * m, f: (f.f || 0) * m, fib: null, oil: 0, ghee: 0, tags: [], food: f };
+  }
+  const d = DISHES.find(x => x.id === st.id);
+  if (!d) return null;
+  return { name: d.name, ...dishNutrition(d, st.grams), tags: d.tags, dish: d };
+}
+
+let est = null;   // the result being shown: { kind, id, grams, pieces, servings, label, alts, histId }
+
+function runEstimate(text){
+  const parsed = parseQuery(text);
+  if (!parsed.q){ est = { error: 'Type the name of a dish, e.g. “kabuli chana 250 g”.' }; return renderEst(); }
+  const hits = matchDishes(parsed.q);
+  if (!hits.length){ est = { error: `I don't know “${esc(parsed.q)}” yet. Add it once with “+ Add a food that's not listed” on the Log food screen, and it will show up here too.` }; return renderEst(); }
+  showCandidate(hits[0], parsed, text, hits.slice(1, 4));
+}
+
+function showCandidate(c, parsed, text, alts){
+  const amt = resolveAmount(c, parsed);
+  est = { kind: c.kind, id: c.d.id, ...amt, q: text, parsed, alts: (alts || []).map(a => ({ kind: a.kind, id: a.d.id, name: a.d.name })) };
+  // keep a history entry; repeat searches move to the top instead of piling up
+  const ref = `${est.kind}:${est.id}`;
+  const same = db.searches.find(h => h.ref === ref && h.grams === (est.grams ?? null) && h.servings === (est.servings ?? null));
+  if (same){ same.t = Date.now(); same.q = text; est.histId = same.id; }
+  else {
+    const h = { id: uid(), t: Date.now(), q: text, ref, grams: est.grams ?? null, pieces: est.pieces ?? null, servings: est.servings ?? null, label: est.label, logged: null };
+    db.searches.unshift(h); est.histId = h.id;
+    if (db.searches.length > 200) db.searches.length = 200;
+  }
+  db.searches.sort((a, b) => b.t - a.t);
+  save(); renderEst(); renderHistory();
+}
+
+function syncHistory(){
+  const h = db.searches.find(x => x.id === est.histId);
+  if (h){ h.grams = est.grams ?? null; h.pieces = est.pieces ?? null; h.servings = est.servings ?? null; h.label = est.label; save(); renderHistory(); }
+}
+
+function verdict(n){
+  const dens = n.kcal ? n.p / n.kcal * 100 : 0;
+  const picks = proteinDense().slice(0, 3).map(f => f.name.split(' (')[0].toLowerCase());
+  if (dens >= 6) return `<b>Great protein pick:</b> ${r1(dens)} g protein per 100 kcal.`;
+  if (dens >= 4) return `<b>Decent protein:</b> ${r1(dens)} g per 100 kcal.`;
+  return `<b>Low in protein</b> (${r1(dens)} g per 100 kcal). Pair it with ${picks.length ? picks.join(', ') : 'a protein side'}.`;
+}
+
+function renderEst(){
+  const box = $('estResult');
+  if (!est){ box.innerHTML = ''; return; }
+  if (est.error){ box.innerHTML = `<div class="est-card"><p class="est-p" style="margin:0">${est.error}</p></div>`; return; }
+  const n = nutritionFor(est);
+  if (!n){ est = null; box.innerHTML = ''; return; }
+  const k = kitchen(), T = db.targets;
+  const today = totals(entriesOn(todayKey()));
+  const pPct = n.p / T.protein * 100, kPct = n.kcal / T.kcal * 100;
+  const leftK = T.kcal - today.kcal - n.kcal, leftP = T.protein - today.p - n.p;
+  const fatNotes = [];
+  if (n.oil >= 1) fatNotes.push(`about <b>${r0(n.oil)} g ${esc(k.oilType || 'oil')}</b> (${fmt(n.oil * 9)} kcal)${k.oilFactor !== 1 ? `, set to ${k.oilLabel} from your notes` : ''}`);
+  if (n.ghee >= 1) fatNotes.push(`<b>${r0(n.ghee)} g ghee</b> on the rotis (${fmt(n.ghee * 9)} kcal), from your notes`);
+  const d = n.dish;
+  const extras = [];
+  if (d && d.milk && k.milk && k.milk !== 'toned') extras.push(`${k.milk === 'full' ? 'full cream' : 'skimmed'} milk`);
+  if (d && d.sugar && k.sugarTsp != null) extras.push(`${fmtQty(k.sugarTsp)} tsp sugar per cup`);
+  const avoidWarn = avoided(n.name) ? `<p class="est-p" style="color:var(--amber)">Your notes say you avoid this.</p>` : '';
+  box.innerHTML = `<div class="est-card">
+    <div class="est-head">
+      <div><div class="est-name">${esc(n.name)}</div><div class="est-amt">${esc(est.label)}${d ? ' · home-style estimate' : ' · your food'}</div></div>
+      <div class="stepper"><button id="estMinus" aria-label="Less">−</button><button id="estPlus" aria-label="More">+</button></div>
+    </div>
+    <div class="est-big">
+      <div><b>${fmt(n.kcal)}</b><span>kcal</span></div>
+      <div><b class="pro">${r1(n.p)} g</b><span>protein</span></div>
+    </div>
+    <div class="est-grid">
+      <div><b>${r0(n.c)} g</b>carbs</div>
+      <div><b>${r0(n.f)} g</b>fat</div>
+      <div><b>${n.fib == null ? '—' : r1(n.fib) + ' g'}</b>fibre</div>
+    </div>
+    <p class="est-p">${verdict(n)}</p>
+    ${n.tags.length ? `<p class="est-p">Good source of <b>${n.tags.join(', ')}</b>.</p>` : ''}
+    ${fatNotes.length ? `<p class="est-p">Includes ${fatNotes.join(' and ')}.</p>` : ''}
+    ${extras.length ? `<p class="est-p">Adjusted for ${extras.join(' and ')}, from your notes.</p>` : ''}
+    ${avoidWarn}
+    <div class="est-day">
+      <div class="meter"><div class="meter-head"><b>Protein</b><span>${r0(pPct)}% of your ${T.protein} g</span></div>
+        <div class="track"><div class="fill protein" style="width:${Math.min(100, pPct)}%"></div></div></div>
+      <div class="meter"><div class="meter-head"><b>Calories</b><span>${r0(kPct)}% of your ${fmt(T.kcal)}</span></div>
+        <div class="track"><div class="fill kcal${kPct > 45 ? ' mid' : ''}" style="width:${Math.min(100, kPct)}%"></div></div></div>
+      <p class="est-p" style="margin:12px 0 0">If you eat this today, you'll have <b>${leftK >= 0 ? fmt(leftK) + ' kcal' : fmt(-leftK) + ' kcal over'}</b> and <b>${leftP > 0 ? r0(leftP) + ' g protein' : 'no protein'}</b> left${leftP > 0 ? '' : ' to go. Target hit'}.</p>
+    </div>
+    ${est.alts.length ? `<div class="alt-row">Not it? ${est.alts.map((a, i) => `<button class="ghost" data-alt="${i}">${esc(a.name)}</button>`).join('')}</div>` : ''}
+    <div class="est-actions">
+      <div class="flabel">Log it to today's</div>
+      <div class="chips">${MEALS.map(m => `<button class="chip" data-logto="${m}">${m}</button>`).join('')}</div>
+      <button class="cancel" id="estDiscard" style="margin-top:8px">Discard</button>
+    </div>
+  </div>`;
+}
+
+$('estForm').addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const v = $('estQ').value.trim();
+  if (!v) return;
+  $('estQ').blur();
+  runEstimate(v);
+});
+
+$('estResult').addEventListener('click', (ev) => {
+  if (!est || est.error) return;
+  const alt = ev.target.closest('[data-alt]');
+  if (alt){
+    const a = est.alts[+alt.dataset.alt];
+    const c = a.kind === 'mine' ? { kind: 'mine', d: db.foods.find(f => f.id === a.id) } : { kind: 'dish', d: DISHES.find(x => x.id === a.id) };
+    const others = est.alts.filter((_, i) => i !== +alt.dataset.alt);
+    const cur = est.kind === 'mine' ? db.foods.find(f => f.id === est.id) : DISHES.find(x => x.id === est.id);
+    // replace the history entry for the wrong match
+    db.searches = db.searches.filter(h => h.id !== est.histId);
+    return showCandidate(c, est.parsed, est.q, [{ kind: est.kind, d: cur }, ...others.map(o => ({ kind: o.kind, d: o.kind === 'mine' ? db.foods.find(f => f.id === o.id) : DISHES.find(x => x.id === o.id) }))].filter(x => x.d));
+  }
+  if (ev.target.closest('#estMinus') || ev.target.closest('#estPlus')){
+    const dir = ev.target.closest('#estPlus') ? 1 : -1;
+    if (est.kind === 'mine'){
+      est.servings = Math.max(0.5, est.servings + dir * 0.5);
+      est.label = `${fmtQty(est.servings)} × ${db.foods.find(f => f.id === est.id)?.unit || 'serving'}`;
+    } else if (est.pieces != null){
+      const d = DISHES.find(x => x.id === est.id);
+      est.pieces = Math.max(0.5, est.pieces + dir * (est.pieces < 1 || (est.pieces === 1 && dir < 0) ? 0.5 : 1));
+      est.grams = est.pieces * d.piece;
+      est.label = `${fmtQty(est.pieces)} ${d.pieceName || 'piece'}${est.pieces === 1 ? '' : 's'} (≈${fmt(est.grams)} g)`;
+    } else {
+      const step = est.grams >= 300 ? 50 : 25;
+      est.grams = Math.max(25, Math.round((est.grams + dir * step) / step) * step);
+      est.label = `${fmt(est.grams)} ${DISHES.find(x => x.id === est.id)?.cup ? 'ml' : 'g'}`;
+    }
+    syncHistory(); return renderEst();
+  }
+  const lt = ev.target.closest('[data-logto]');
+  if (lt){
+    const n = nutritionFor(est), meal = lt.dataset.logto;
+    db.entries.push({ id: uid(), day: todayKey(), meal, foodId: `${est.kind}:${est.id}`, name: n.name,
+      unit: est.label.replace(' · a usual serving', ''), qty: 1, kcal: r0(n.kcal), p: r1(n.p), c: r1(n.c), f: r1(n.f), t: Date.now() });
+    const h = db.searches.find(x => x.id === est.histId);
+    if (h) h.logged = meal;
+    est = null; $('estQ').value = '';
+    save(); renderEst(); renderHistory();
+    return toast(`Logged to today's ${meal}`);
+  }
+  if (ev.target.closest('#estDiscard')){
+    est = null; $('estQ').value = '';
+    renderEst();
+    toast('Discarded. It stays in past searches');
+  }
+});
+
+function renderHistory(){
+  const list = db.searches;
+  $('estHistory').hidden = !list.length;
+  $('histSummary').textContent = `Past searches (${list.length})`;
+  const when = (t) => new Date(t).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true });
+  $('histList').innerHTML = list.map(h => {
+    const [kind, id] = h.ref.split(':');
+    const n = nutritionFor({ kind, id, grams: h.grams, servings: h.servings });
+    if (!n) return '';
+    return `<div class="hrow">
+      <button class="hmain" data-hist="${h.id}">
+        <span class="hn">${esc(n.name)}${h.logged ? `<span class="tagl">logged · ${h.logged}</span>` : ''}</span>
+        <span class="hs">${esc(h.label.replace(' · a usual serving', ''))} · ${fmt(n.kcal)} kcal · ${r1(n.p)} g protein</span>
+        <span class="hs">${when(h.t)}</span>
+      </button>
+      <button class="hx" data-histdel="${h.id}" aria-label="Remove from history">✕</button>
+    </div>`;
+  }).join('') + (list.length ? `<div class="note-line" style="padding-top:10px"><button id="histClear">Clear all past searches</button></div>` : '');
+}
+
+$('histList').addEventListener('click', (ev) => {
+  const del = ev.target.closest('[data-histdel]');
+  if (del){
+    db.searches = db.searches.filter(h => h.id !== del.dataset.histdel);
+    if (est && est.histId === del.dataset.histdel){ est = null; renderEst(); }
+    save(); return renderHistory();
+  }
+  if (ev.target.closest('#histClear')){
+    if (!confirm('Clear all past searches?')) return;
+    db.searches = []; est = null; save(); renderEst(); return renderHistory();
+  }
+  const b = ev.target.closest('[data-hist]');
+  if (b){
+    const h = db.searches.find(x => x.id === b.dataset.hist);
+    const [kind, id] = h.ref.split(':');
+    est = { kind, id, grams: h.grams, pieces: h.pieces, servings: h.servings, label: h.label, q: h.q, parsed: parseQuery(h.q), alts: [], histId: h.id };
+    $('estQ').value = h.q;
+    renderEst();
+    $('estResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+});
+
+/* ============ NOTES ============ */
+function renderNotes(){
+  const k = kitchen();
+  const when = (t) => new Date(t).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+  $('notesList').innerHTML = [...db.notes].sort((a, b) => b.t - a.t).map(n => {
+    const hits = k.byNote[n.id] || [];
+    return `<div class="note">
+      <div class="note-top"><span>${when(n.t)}</span><button data-notedel="${n.id}">Delete</button></div>
+      <div class="note-text">${esc(n.text)}</div>
+      <div class="note-hits">${hits.length ? hits.map(h => `<span class="hit">✓ ${esc(h)}</span>`).join('')
+        : '<span class="hit none">Saved. The app can\'t turn this into numbers yet</span>'}</div>
+    </div>`;
+  }).join('');
+}
+$('noteSave').onclick = () => {
+  const text = $('noteIn').value.trim();
+  if (!text) return;
+  const n = { id: uid(), t: Date.now(), text };
+  db.notes.push(n); save();
+  $('noteIn').value = '';
+  const hits = kitchen().byNote[n.id] || [];
+  render();
+  toast(hits.length ? `Note saved · ${hits.length} change${hits.length === 1 ? '' : 's'} applied` : 'Note saved');
+};
+$('notesList').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-notedel]'); if (!b) return;
+  if (!confirm('Delete this note? Anything it changed goes back to the default.')) return;
+  db.notes = db.notes.filter(n => n.id !== b.dataset.notedel);
+  save(); render();
+});
 
 function topSources(days, key, n){
   const by = {};
@@ -1394,7 +2068,7 @@ $('importFile').onchange = (ev) => {
 };
 $('resetBtn').onclick = () => {
   if (!confirm('Erase all your logs, weights and settings from this phone? This cannot be undone.')) return;
-  db = { profile: null, targets: null, manual: false, entries: [], water: {}, weights: [], foods: [], lastBackup: 0 };
+  db = emptyDb(); est = null;
   ls.del(KEY); idb.set(KEY, null); boot();
 };
 
