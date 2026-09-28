@@ -183,6 +183,12 @@
   .cancel{width:100%;padding:13px;font-size:14px;color:var(--ink-soft);margin-top:4px}
   .del{width:100%;border:1px solid var(--rule);color:var(--red);border-radius:var(--radius);padding:14px;font-size:15px;font-weight:600;background:var(--card)}
   .err{color:var(--red);font-size:13px;margin-top:8px;min-height:18px}
+  .banner{margin:18px 0 0;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .banner.warn{background:#FFF4E0;border:1px solid #FFD79A;color:#7A4E00}
+  .banner.info{background:#FFFDF7;border:1px dashed var(--rule);color:var(--ink-soft)}
+  .banner button{background:var(--ink);color:#fff;border-radius:9px;padding:8px 12px;font-size:13px;font-weight:600;white-space:nowrap}
+  .restore-line{text-align:center;font-size:13px;color:var(--ink-soft);margin:18px 0 0}
+  .restore-line button{text-decoration:underline;color:var(--ink);font-size:13px;padding:0}
   .note-line{font-size:12.5px;color:var(--ink-soft);padding:14px 0 0;line-height:1.7}
   .note-line button{text-decoration:underline;font-size:12.5px;color:var(--ink-soft);padding:0}
   .target-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
@@ -289,6 +295,7 @@
     <div class="err" id="obErr"></div>
     <button class="save" id="obNext">Work out my targets</button>
     <button class="cancel" id="obCancel" hidden>Cancel</button>
+    <p class="restore-line" id="obRestore">Moving from another phone? <button id="obRestoreBtn">Restore from a backup</button></p>
   </div>
 
   <div class="inner" id="obResult" hidden>
@@ -338,6 +345,7 @@
           <button id="waterPlus" aria-label="One glass more">+</button>
         </div>
       </div>
+      <div class="banners"></div>
     </section>
     <section>
       <h2>Meals</h2>
@@ -418,10 +426,12 @@
     </section>
     <section>
       <h2>Your data</h2>
-      <div class="note-line" style="padding-top:0">
+      <p class="meta" style="margin:-6px 0 0">Your log is stored only on this phone. A backup is a small file you keep somewhere safe, such as iCloud Drive, Google Drive or a WhatsApp chat with yourself. To restore, open that file here. Restoring adds what's missing and never deletes what's already on this phone.</p>
+      <div class="banners"></div>
+      <div class="note-line">
         <span id="backupState">Data lives on this phone.</span><br>
         <button id="exportBtn">Back up now</button> ·
-        <button id="importBtn">Restore from backup</button> ·
+        <button id="importBtn">Restore from backup</button><br>
         <button id="resetBtn">Erase everything</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
       </div>
@@ -516,6 +526,7 @@ const ls = (() => {
   let mem = {}, ok = true;
   try { localStorage.setItem('__k','1'); localStorage.removeItem('__k'); } catch(e){ ok = false; }
   return {
+    ok,
     get(k){ try { return ok ? localStorage.getItem(k) : (mem[k] ?? null); } catch(e){ return mem[k] ?? null; } },
     set(k,v){ try { ok ? localStorage.setItem(k,v) : (mem[k]=v); } catch(e){ mem[k]=v; } },
     del(k){ try { ok ? localStorage.removeItem(k) : delete mem[k]; } catch(e){ delete mem[k]; } }
@@ -677,6 +688,24 @@ function loadFrom(raw){
 }
 const loaded = loadFrom(ls.get(KEY));
 if (loaded) db = loaded;
+
+// Adds whatever `incoming` has that `target` doesn't. Never deletes or overwrites.
+function mergeInto(target, incoming){
+  if (!incoming) return false;
+  let changed = false;
+  const ids = new Set(target.entries.map(e => e.id));
+  incoming.entries.forEach(e => { if (e && e.id && e.day && !ids.has(e.id)){ target.entries.push(e); ids.add(e.id); changed = true; } });
+  const days = new Set(target.weights.map(w => w.day));
+  incoming.weights.forEach(w => { if (w && w.day && w.kg > 0 && !days.has(w.day)){ target.weights.push(w); days.add(w.day); changed = true; } });
+  Object.entries(incoming.water).forEach(([d, n]) => { if (+n > (target.water[d] || 0)){ target.water[d] = +n; changed = true; } });
+  const fids = new Set(target.foods.map(f => f.id));
+  incoming.foods.forEach(f => { if (f && f.id && !fids.has(f.id)){ target.foods.push(f); fids.add(f.id); changed = true; } });
+  if (!target.profile && incoming.profile && incoming.targets){
+    target.profile = incoming.profile; target.targets = incoming.targets; target.manual = incoming.manual; changed = true;
+  }
+  if (incoming.lastBackup > target.lastBackup) target.lastBackup = incoming.lastBackup;
+  return changed;
+}
 
 function save(){
   const json = JSON.stringify(db);
@@ -1267,10 +1296,31 @@ function renderMe(){
   $('myFoods').innerHTML = db.foods.length
     ? db.foods.map(f => `<button class="frow" data-myfood="${esc(f.id)}"><span><span class="fn">${esc(f.name)}</span><span class="fu">${esc(f.unit)}</span></span><span class="fk">${fmt(f.kcal)} kcal<br><b>${r1(f.p)} g protein</b></span></button>`).join('')
     : `<p class="empty">Foods you add yourself show up here, like your mom's dal or a protein bar you buy. Add them from the Log food screen.</p>`;
-  $('backupState').textContent = db.lastBackup
-    ? `Data lives on this phone. Last backup ${new Date(db.lastBackup).toLocaleDateString('en-IN', { day:'numeric', month:'short' })}.`
-    : 'Data lives on this phone. Back up now and then so you don\'t lose it.';
+  renderBanners();
 }
+
+const DAY = 86400000;
+const hasData = () => db.entries.length > 0 || db.weights.length > 1;
+function renderBanners(){
+  let html = '';
+  if (!ls.ok) html += `<div class="banner info">Preview mode: your entries clear when you close this. Open the installed app to keep them.</div>`;
+
+  const since = db.lastBackup ? Date.now() - db.lastBackup : null;
+  if (!hasData()) $('backupState').textContent = 'Data lives on this phone.';
+  else if (!db.lastBackup) $('backupState').textContent = 'Never backed up.';
+  else {
+    const d = Math.floor(since / DAY);
+    $('backupState').textContent = d < 1 ? 'Backed up today.' : `Last backup ${d} day${d === 1 ? '' : 's'} ago.`;
+  }
+
+  if (hasData() && (!db.lastBackup || since > 7 * DAY)){
+    html += `<div class="banner warn">
+      <span>${db.lastBackup ? 'It has been over a week since your last backup.' : 'No backup yet. One tap saves a copy to iCloud Drive, Google Drive or WhatsApp.'}</span>
+      <button data-backup>Back up</button></div>`;
+  }
+  document.querySelectorAll('.banners').forEach(box => { box.innerHTML = html; });
+}
+document.addEventListener('click', (ev) => { if (ev.target.closest('[data-backup]')) doBackup(); });
 $('myFoods').addEventListener('click', (ev) => {
   const b = ev.target.closest('[data-myfood]'); if (!b) return;
   openFoodSheet(db.foods.find(f => f.id === b.dataset.myfood));
@@ -1293,24 +1343,54 @@ $('autoTargets').onclick = () => {
   save(); $('manualTargets').hidden = true; render(); toast('Using calculated targets');
 };
 
-$('exportBtn').onclick = () => {
-  db.lastBackup = Date.now(); save();
-  const blob = new Blob([JSON.stringify(db, null, 1)], { type:'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `khaana-peena-${todayKey()}.json`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  renderMe();
-};
+/* ============ backup and restore ============ */
+async function doBackup(){
+  const name = `khaana-peena-${todayKey()}.json`;
+  const json = JSON.stringify({ app: 'khaana-peena', ...db, lastBackup: Date.now() }, null, 2);
+  const blob = new Blob([json], { type:'application/json' });
+  let done = false;
+  try {
+    const file = new File([blob], name, { type:'application/json' });
+    if (navigator.canShare && navigator.canShare({ files:[file] })){
+      await navigator.share({ files:[file], title:'Khaana Peena backup' });
+      done = true;
+    }
+  } catch(e){ if (e && e.name === 'AbortError') return; }
+  if (!done){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  }
+  db.lastBackup = Date.now();
+  save(); renderBanners(); toast('Backup saved');
+}
+$('exportBtn').onclick = doBackup;
 $('importBtn').onclick = () => $('importFile').click();
-$('importFile').onchange = async (ev) => {
-  const file = ev.target.files[0]; if (!file) return;
-  const incoming = loadFrom(await file.text());
+$('obRestoreBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = (ev) => {
+  const f = ev.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    let raw = null;
+    try { raw = JSON.parse(r.result); } catch(e){}
+    const incoming = raw && !raw.expenses && (raw.app === 'khaana-peena' || raw.profile) ? loadFrom(raw) : null;
+    if (!incoming){ toast('That file is not a Khaana Peena backup'); return; }
+    const hadProfile = !!db.profile;
+    const beforeE = db.entries.length, beforeW = db.weights.length;
+    mergeInto(db, incoming);
+    save();
+    const e = db.entries.length - beforeE, w = db.weights.length - beforeW;
+    if (!hadProfile && db.profile){ boot(); }
+    else render();
+    toast(e || w
+      ? `Restored ${e} food entr${e === 1 ? 'y' : 'ies'}${w ? ` and ${w} weigh-in${w === 1 ? '' : 's'}` : ''}`
+      : 'Everything in that backup is already here');
+  };
+  r.readAsText(f);
   ev.target.value = '';
-  if (!incoming || !incoming.profile) return toast('That file doesn\'t look like a Khaana Peena backup');
-  if (!confirm('Replace what is on this phone with this backup?')) return;
-  db = incoming; save(); boot(); toast('Backup restored');
 };
 $('resetBtn').onclick = () => {
   if (!confirm('Erase all your logs, weights and settings from this phone? This cannot be undone.')) return;
@@ -1337,6 +1417,7 @@ function openOnboarding(editing){
   $('obAge').value = p ? p.age : ''; $('obHeight').value = p ? p.height : ''; $('obWeight').value = p ? p.weight : '';
   $('obErr').textContent = '';
   $('obCancel').hidden = !editing;
+  $('obRestore').hidden = !!editing;
   $('obForm').hidden = false; $('obResult').hidden = true;
   $('onboard').hidden = false; $('onboard').scrollTop = 0;
 }
@@ -1402,6 +1483,7 @@ function render(){
   if (tab === 'progress') renderProgress();
   if (tab === 'learn') renderLearn();
   if (tab === 'me') renderMe();
+  else renderBanners();
 }
 
 function boot(){
@@ -1410,13 +1492,48 @@ function boot(){
   else { $('onboard').hidden = true; render(); }
 }
 
-// If localStorage was wiped (e.g. by iOS), recover from the IndexedDB mirror.
-(async () => {
-  if (!db.profile){
-    const mirrored = loadFrom(await idb.get(KEY));
-    if (mirrored && mirrored.profile){ db = mirrored; ls.set(KEY, JSON.stringify(db)); }
+/* ============ install plumbing ============ */
+(function(){
+  function icon(size){
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const x = c.getContext('2d');
+    x.fillStyle = '#18231D'; x.fillRect(0,0,size,size);
+    x.fillStyle = '#7BD389';
+    x.font = `${Math.round(size*0.56)}px Georgia, serif`;
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText('K', size/2, size*0.54);
+    return c.toDataURL('image/png');
   }
-  boot();
+  try {
+    const manifest = {
+      name:'Khaana Peena', short_name:'Khaana Peena', start_url:'.', display:'standalone',
+      background_color:'#F7F8F3', theme_color:'#F7F8F3',
+      icons:[{ src: icon(192), sizes:'192x192', type:'image/png' },
+             { src: icon(512), sizes:'512x512', type:'image/png' }]
+    };
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type:'application/manifest+json' }));
+    document.head.appendChild(link);
+    const apple = document.createElement('link');
+    apple.rel = 'apple-touch-icon'; apple.href = icon(180);
+    document.head.appendChild(apple);
+  } catch(e){}
+  // ask the browser not to clear this app's storage when the phone is low on space
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+})();
+
+boot();
+
+// If localStorage was wiped (e.g. by iOS), fill the gaps from the IndexedDB mirror.
+(async () => {
+  const hadProfile = !!db.profile;
+  const recovered = mergeInto(db, loadFrom(await idb.get(KEY)));
+  if (!recovered) return;
+  save();
+  if (!hadProfile && db.profile) boot(); else render();
+  toast('Recovered data from the backup copy on this phone');
 })();
 
 // Roll over to the new day if the app stays open past midnight.
