@@ -59,18 +59,6 @@
   }
   .period-btn svg{opacity:.5}
 
-  .total{margin-top:20px}
-  .total .amount{
-    font-family:'Fraunces',Georgia,serif;
-    font-size:44px;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
-    display:flex;align-items:baseline;gap:2px;
-  }
-  .total .amount .sym{font-size:28px;opacity:.55;margin-right:2px}
-  .total .amount .warn{font-size:26px;margin-right:8px}
-  .total.high .amount{color:var(--red);font-weight:600}
-  .total.mid .amount{color:var(--amber)}
-  .total.low .amount{color:var(--green)}
-  .total .meta{color:var(--ink-soft);font-size:13.5px;margin-top:9px}
   .zone{font-weight:600}
   .ticker{color:var(--ink-soft);white-space:nowrap}
   .total.high .zone{color:var(--red)}
@@ -93,27 +81,55 @@
   section:last-of-type{border-bottom:none}
   h2{font-size:13.5px;font-weight:600;margin:0 0 16px;color:var(--ink-soft)}
 
-  .subtotal{font-size:13px;color:var(--ink-soft);margin-top:8px}
+  .subtotal{font-size:13px;color:var(--ink-soft);margin-top:7px}
   .subtotal b{color:var(--ink);font-variant-numeric:tabular-nums}
-  .bar-row{margin-bottom:16px;cursor:pointer;transition:opacity .2s}
-  .bar-row.dim{opacity:.22}
   .tag{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);border:1px solid var(--rule);padding:1px 6px;border-radius:999px;margin-left:7px;vertical-align:middle}
-  .chart-divider{font-size:11.5px;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:14px;margin:4px 0 14px;font-weight:600}
-  .filterbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:11px 13px;background:var(--card);border:1px solid var(--rule);border-radius:12px;font-size:13px}
-  .filterbar .fb-actions{display:flex;gap:8px;align-items:center}
-  .filterbar button{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--rule);white-space:nowrap}
-  .filterbar button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .filterbar .x{color:var(--ink-soft)}
+
+  /* ---- donut ---- */
+  .viz{text-align:center;padding-top:22px}
+  .donut-wrap{position:relative;width:186px;height:186px;margin:0 auto}
+  .donut-wrap svg{width:100%;height:100%;display:block}
+  .seg{cursor:pointer;transition:opacity .2s,stroke-width .2s}
+  .seg.off{opacity:.2}
+  .seg.on{stroke-width:26}
+  .seg.rest{cursor:default}
+  .donut-center{position:absolute;inset:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+  .dc-amt{font-family:'Fraunces',Georgia,serif;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .dc-lbl{font-size:11.5px;color:var(--ink-soft);line-height:1.25;max-width:104px}
+  .total.high .dc-amt{color:var(--red);font-weight:600}
+  .total.mid .dc-amt{color:var(--amber)}
+  .total.low .dc-amt{color:var(--green)}
+  .total .meta{color:var(--ink-soft);font-size:13px;margin-top:16px}
+  .zoneline{font-size:13.5px;margin-top:7px;font-weight:500}
+  .total.high .zoneline{color:var(--red)}
+  .total.mid .zoneline{color:var(--amber)}
+  .total.low .zoneline{color:var(--green)}
+  .trend{width:100%;height:auto;display:block;margin-top:4px}
+  .tpt{cursor:pointer}
+  .hint{color:var(--ink-soft);font-size:13.5px;padding:10px 0 20px;max-width:40ch;line-height:1.6}
+
+  /* ---- category rows ---- */
+  .row{border-bottom:1px solid var(--rule-soft)}
+  .row:last-child{border-bottom:none}
+  .row-head{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;padding:13px 0;text-align:left}
+  .r-left{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:500;min-width:0}
+  .r-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .r-left .dot{margin-top:0}
+  .r-right{display:flex;align-items:baseline;gap:9px;flex:none}
+  .r-pct{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums;min-width:30px;text-align:right}
+  .r-right b{font-variant-numeric:tabular-nums;font-size:14px;min-width:66px;text-align:right}
+  .g-count{font-size:11px;color:var(--ink-soft);border:1px solid var(--rule);border-radius:999px;padding:0 6px;font-weight:500;flex:none}
+  .panel{padding:0 0 14px;animation:drop .18s ease}
+  @keyframes drop{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  .panel-foot{display:flex;justify-content:flex-end;padding-top:10px}
+  .pill-btn{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--rule);background:var(--card);color:var(--ink-soft);white-space:nowrap}
+  .pill-btn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chev{display:inline-block;color:var(--ink-soft);font-size:17px;line-height:1;transform:rotate(90deg);transition:transform .18s}
+  .chev.open{transform:rotate(-90deg)}
+  .divider{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:15px;margin-top:6px;font-weight:600}
   .when-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--rule);background:var(--card);border-radius:11px;padding:10px 10px 10px 13px}
   .pencil{width:36px;height:36px;flex:none;border-radius:9px;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;font-size:15px}
   .pencil[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .bar-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px}
-  .bar-name{font-size:14.5px;font-weight:500}
-  .bar-amt{font-size:14px;color:var(--ink-soft);font-variant-numeric:tabular-nums;white-space:nowrap}
-  .bar-track{height:10px;background:var(--rule-soft);border-radius:5px;overflow:hidden}
-  .bar-fill{height:100%;border-radius:5px;transition:width .45s cubic-bezier(.2,.7,.3,1)}
-  .bar-pct{font-size:12.5px;font-variant-numeric:tabular-nums;font-weight:600;min-width:38px;text-align:right}
-  .bar-head .right{display:flex;align-items:baseline;gap:10px}
 
   .tbl{width:100%;border-collapse:collapse;table-layout:fixed}
   .tbl th{text-align:left;font-size:11px;font-weight:600;color:var(--ink-soft);padding:0 6px 8px 0;border-bottom:1px solid var(--rule)}
@@ -128,21 +144,14 @@
   .tbl tbody tr{cursor:pointer}
   .amt{font-variant-numeric:tabular-nums;font-weight:500;white-space:nowrap;font-size:13.5px}
 
-  .sec-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
-  .sec-head h2{margin:0}
+  .filters{display:flex;align-items:center;gap:7px;margin-bottom:18px}
+  .selpill{flex:1;min-width:0;border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:7px 11px;font-size:12.5px;color:var(--ink);-webkit-appearance:none;appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='11' height='7'><path d='M1 1l4.5 4.5L10 1' stroke='%236B7183' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 11px center;padding-right:28px}
+  .selpill[data-on="true"],.datepill[data-on="true"]{background-color:var(--ink);color:#fff;border-color:var(--ink)}
   .date-filter{display:flex;align-items:center;gap:6px}
   .datepill{border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:6px 11px;font-size:12.5px;color:var(--ink);min-width:0}
   .x-btn{border:1px solid var(--rule);background:var(--card);border-radius:999px;width:28px;height:28px;font-size:13px;color:var(--ink-soft)}
-  .group{border-bottom:1px solid var(--rule-soft)}
-  .group:last-child{border-bottom:none}
-  .group-head{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;text-align:left}
-  .g-left{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:500;min-width:0}
-  .g-left .dot{margin-top:0}
-  .g-count{font-size:11.5px;color:var(--ink-soft);border:1px solid var(--rule);border-radius:999px;padding:1px 7px;font-weight:500;flex:none}
-  .g-right{display:flex;align-items:center;gap:10px;flex:none}
-  .g-right b{font-variant-numeric:tabular-nums;font-size:14px}
-  .chev{display:inline-block;color:var(--ink-soft);font-size:17px;line-height:1;transform:rotate(90deg);transition:transform .18s}
-  .chev.open{transform:rotate(-90deg)}
   .tbl.grp{margin:0 0 12px}
   .tbl.grp td{font-size:13px;padding:9px 6px 9px 0;border-bottom:1px solid var(--rule-soft)}
   .tbl.grp tr:last-child td{border-bottom:none}
@@ -227,31 +236,34 @@
       </button>
     </div>
   </div>
-  <div class="total" id="totalBox">
-    <div class="amount num" id="amountLine"></div>
-    <div class="meta" id="totalMeta">No expenses yet</div>
-    <div class="subtotal" id="subtotal"></div>
-  </div>
   <div class="menu" id="periodMenu" role="menu"></div>
 </header>
 
 <main>
-  <section>
-    <h2>Where it went</h2>
-    <div id="chart"></div>
+  <section class="viz total" id="totalBox">
+    <div class="donut-wrap" id="donutWrap">
+      <svg viewBox="0 0 200 200" id="donut" aria-label="Spend by category"></svg>
+      <div class="donut-center">
+        <div class="dc-amt num" id="centerAmt">₹0</div>
+        <div class="dc-lbl" id="centerLbl"></div>
+      </div>
+    </div>
+    <div id="trendWrap" hidden></div>
+    <div class="meta" id="totalMeta">No expenses yet</div>
+    <div class="zoneline" id="zoneLine"></div>
+    <div class="subtotal" id="subtotal"></div>
   </section>
 
   <section>
-    <div class="sec-head">
-      <h2>Every entry</h2>
-      <div class="date-filter">
-        <input type="date" id="dateInput" class="datepill" aria-label="Filter by date">
-        <button class="x-btn" id="clearDate" hidden aria-label="Clear date filter">✕</button>
-      </div>
+    <div class="filters">
+      <select class="selpill" id="catFilter" aria-label="Filter by category"></select>
+      <input type="date" id="dateInput" class="datepill" aria-label="Filter by date">
+      <button class="x-btn" id="clearFilters" hidden aria-label="Clear filters">✕</button>
     </div>
-    <div id="tableWrap"></div>
+    <div id="listWrap"></div>
     <div id="banners"></div>
     <div class="note-line">
+      <span id="incomeState"></span> <button id="editIncome">Change</button><br>
       <span id="backupState">Data lives on this phone.</span><br>
       <button id="exportBtn">Back up now</button> ·
       <button id="importBtn">Restore from backup</button>
@@ -320,6 +332,22 @@
   <button class="cancel" id="cancelBtn">Cancel</button>
 </div>
 
+<div class="sheet" id="incomeSheet" role="dialog" aria-modal="true" aria-label="Monthly income">
+  <div class="grab"></div>
+  <h3 id="incomeTitle">Monthly income</h3>
+  <div class="field">
+    <label for="incomeIn">Take-home income</label>
+    <div class="amount-wrap">
+      <span class="sym">₹</span>
+      <input class="amount-in num" id="incomeIn" type="text" inputmode="decimal" autocomplete="off">
+    </div>
+    <div class="calcout ok" id="incomeOut"></div>
+  </div>
+  <p class="hint" id="incomeHint" style="padding-top:0"></p>
+  <button class="save" id="incomeSave">Save</button>
+  <button class="cancel" id="incomeCancel">Cancel</button>
+</div>
+
 <div class="sheet" id="detailSheet" role="dialog" aria-modal="true" aria-label="Expense details">
   <div class="grab"></div>
   <h3 id="detailTitle">Expense</h3>
@@ -369,12 +397,13 @@ const idb = {
 };
 
 const BASE_CATS = ['Rent','Rental','Groceries','Home Essentials','Personal Essentials','Shopping','Commute','Travel','Eating Out','Food Apps'];
-const PALETTE = ['#FF5A5F','#FFA62B','#57C84D','#22B8CF','#7C5CFF','#F0508C','#3B82F6','#12B886','#FF7847','#F7C948','#C158DC','#8FBF3F','#FF4D8D','#00A6A6','#E8590C','#4DABF7'];
+const PALETTE = ['#FF5A5F','#BF8C00','#57C84D','#22B8CF','#7C5CFF','#F0508C','#3B82F6','#12B886','#FF7847','#9B4DE0','#8FBF3F','#00A6A6','#E8590C','#4DABF7','#B5179E','#7A6A4F'];
+const REST_COLOR = '#9AA0AE';
 
-const CAP  = 100000;   // above this: red
-const WARN = 70000;    // 70k to 1L: amber
+const SAFE_PCT = 0.33;   // at or under a third of income: safe
+const CAP_PCT  = 0.40;   // above 40% of income: over limit
 
-let db = { expenses: [], customCats: [], excluded: [], lastBackup: 0 };
+let db = { expenses: [], customCats: [], excluded: [], income: 300000, incomes: {}, lastBackup: 0 };
 
 function loadFrom(raw){
   try {
@@ -384,6 +413,8 @@ function loadFrom(raw){
       expenses: Array.isArray(p.expenses) ? p.expenses : [],
       customCats: Array.isArray(p.customCats) ? p.customCats : [],
       excluded: Array.isArray(p.excluded) ? p.excluded : [],
+      income: Number(p.income) > 0 ? Number(p.income) : 300000,
+      incomes: (p.incomes && typeof p.incomes === 'object') ? p.incomes : {},
       lastBackup: p.lastBackup || 0
     };
   } catch(e){ return null; }
@@ -398,6 +429,10 @@ function mergeInto(target, incoming){
   incoming.expenses.forEach(x => { if (x && x.id && !seen.has(x.id)){ target.expenses.push(x); seen.add(x.id); changed = true; } });
   incoming.customCats.forEach(c => { if (!target.customCats.includes(c) && !BASE_CATS.includes(c)){ target.customCats.push(c); changed = true; } });
   incoming.excluded.forEach(c => { if (!target.excluded.includes(c)){ target.excluded.push(c); changed = true; } });
+  if (incoming.income && incoming.income !== target.income){ target.income = incoming.income; changed = true; }
+  Object.entries(incoming.incomes || {}).forEach(([k,v]) => {
+    if (v > 0 && target.incomes[k] !== v){ target.incomes[k] = v; changed = true; }
+  });
   if (incoming.lastBackup > target.lastBackup) target.lastBackup = incoming.lastBackup;
   return changed;
 }
@@ -432,9 +467,9 @@ const dayKey = (ts) => { const d = new Date(ts); const p = n => String(n).padSta
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let viewMode = 'month';
-let activeCat = null;
+let openCat = null;        // the one expanded category, or null
+let filterCat = null;      // category filter — the picker and the donut share it
 let activeDate = null;
-const openCats = new Set();
 let currentMonth = monthKey(new Date());
 let currentYear = String(new Date().getFullYear());
 
@@ -455,14 +490,47 @@ function inPeriod(){
 }
 const periodName = () => viewMode === 'month' ? labelFor(currentMonth) : currentYear;
 
+// income applies from the month it was set onwards, the way a salary actually works
+function incomeFor(mk){
+  const keys = Object.keys(db.incomes || {}).filter(k => k <= mk).sort();
+  if (keys.length) return db.incomes[keys[keys.length - 1]];
+  return db.income > 0 ? db.income : 300000;
+}
+function trackedMonths(){
+  const seen = new Set();
+  db.expenses.forEach(e => {
+    const d = new Date(e.ts);
+    if (String(d.getFullYear()) === currentYear) seen.add(monthKey(d));
+  });
+  return [...seen].sort();
+}
+// the two lines that define the zones, for whatever period is on screen
+function budgetLines(){
+  if (viewMode === 'month'){
+    const inc = incomeFor(currentMonth);
+    return { income: inc, safe: inc * SAFE_PCT, cap: inc * CAP_PCT, months: 1 };
+  }
+  const ms = trackedMonths();
+  const sum = ms.length ? ms.reduce((s,m) => s + incomeFor(m), 0) : incomeFor(`${currentYear}-01`);
+  return { income: sum, safe: sum * SAFE_PCT, cap: sum * CAP_PCT, months: Math.max(ms.length, 1) };
+}
+
 function band(total){
-  const cap = viewMode === 'year' ? CAP * 12 : CAP;
-  const warn = viewMode === 'year' ? WARN * 12 : WARN;
+  const { safe, cap } = budgetLines();
   if (total > cap) return 'high';
-  if (total >= warn) return 'mid';
+  if (total > safe) return 'mid';
   return 'low';
 }
-const ZONE = { high:'Over limit', mid:'Watch it', low:'Safe zone' };
+const ZONE = { high:'Over limit', mid:'⚠ Watch it', low:'Safe zone' };
+
+// says where you stand against the budget — never a share of income
+function zoneSentence(total){
+  const { safe, cap } = budgetLines();
+  const z = band(total);
+  if (z === 'high') return `${ZONE.high} · ₹${money(Math.round(total - cap))} over your ₹${money(Math.round(cap))} budget`;
+  if (z === 'mid')  return `${ZONE.mid} · ₹${money(Math.round(total - safe))} past the safe line · ₹${money(Math.round(cap - total))} left before the cap`;
+  return `${ZONE.low} · ₹${money(Math.round(safe - total))} before the warning zone`;
+}
 
 function daysToReset(){
   const now = new Date();
@@ -479,135 +547,255 @@ function daysToReset(){
 const resetText = (n) => n === 0 ? 'last day' : `${n} day${n === 1 ? '' : 's'} to reset`;
 
 /* ============ render ============ */
+const DONUT_SLICES = 5;        // top N get their own colour; the tail folds into "Rest"
+const MONTH_LETTER = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+
+function aggregate(list){
+  const by = {};
+  list.forEach(e => {
+    const a = by[e.category] || (by[e.category] = { cat: e.category, total: 0, items: [], latest: 0 });
+    a.total += e.amount;
+    a.items.push(e);
+    if (e.ts > a.latest) a.latest = e.ts;
+  });
+  return Object.values(by);
+}
+
+function donutHTML(cats, total){
+  if (!total) return '';
+  const R = 74, C = 2 * Math.PI * R;
+  const big = [...cats].sort((a,b) => b.total - a.total);
+  let parts = big.slice(0, DONUT_SLICES).map(c => ({ cat: c.cat, total: c.total, color: colorFor(c.cat) }));
+  const tail = big.slice(DONUT_SLICES);
+  if (tail.length) parts.push({ cat: null, total: tail.reduce((s,c) => s + c.total, 0), color: REST_COLOR });
+
+  const gap = parts.length > 1 ? 3 : 0;
+  let off = 0;
+  const segs = parts.map(p => {
+    const full = p.total / total * C;
+    const len = Math.max(full - gap, 1.5);
+    const cls = p.cat === null ? 'seg rest'
+      : (filterCat === p.cat ? 'seg on' : (filterCat ? 'seg off' : 'seg'));
+    const el = `<circle class="${cls}"${p.cat ? ` data-cat="${esc(p.cat)}"` : ''} r="${R}" cx="100" cy="100"
+      fill="none" stroke="${p.color}" stroke-width="20"
+      stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"></circle>`;
+    off += full;
+    return el;
+  }).join('');
+  return `<g transform="rotate(-90 100 100)">${segs}</g>`;
+}
+
+/* ---- year view: one point per month, Jan to Dec ---- */
+function trendHTML(){
+  const W = 320, H = 168, L = 8, R = 8, T = 16, B = 24;
+  const totals = Array(12).fill(0);
+  let any = false;
+  db.expenses.forEach(e => {
+    const d = new Date(e.ts);
+    if (String(d.getFullYear()) !== currentYear) return;
+    if (filterCat ? e.category !== filterCat : isOneTime(e.category)) return;
+    totals[d.getMonth()] += e.amount;
+    any = true;
+  });
+  if (!any) return `<p class="empty">Nothing recorded in ${esc(currentYear)} yet.</p>`;
+
+  const now = new Date();
+  const last = String(now.getFullYear()) === currentYear ? now.getMonth() : 11;
+  const first = totals.findIndex((v,i) => v > 0 && i <= last);   // start at the first tracked month
+  const vals = totals.slice(first, last + 1);
+  const bl = budgetLines();
+  const limit = filterCat ? null : bl.cap / bl.months;          // the 40% cap, per month
+  const peak = Math.max(...vals, limit || 0) * 1.12 || 1;
+
+  const span = vals.length - 1;
+  const x = i => L + (W - L - R) * (span === 0 ? 0.5 : i / span);
+  const y = v => T + (H - T - B) * (1 - v / peak);
+  const line = vals.map((v,i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const stroke = filterCat ? colorFor(filterCat) : '#3B82F6';
+
+  const limitLine = limit ? `
+    <line x1="${L}" y1="${y(limit).toFixed(1)}" x2="${W-R}" y2="${y(limit).toFixed(1)}"
+      stroke="${'#D42D20'}" stroke-width="1" stroke-dasharray="4 4" opacity=".55"></line>
+    <text x="${W-R}" y="${(y(limit)-5).toFixed(1)}" text-anchor="end" font-size="9" fill="#D42D20" opacity=".8">40% of income</text>` : '';
+
+  const dots = vals.map((v,i) => `
+    <circle class="tpt" data-m="${first + i}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4.5"
+      fill="${stroke}" stroke="#FBF9F4" stroke-width="2"><title>${MONTHS[first + i]}: ₹${money(v)}</title></circle>`).join('');
+
+  const lastVal = vals[vals.length - 1];
+  const labelAnchor = span === 0 ? 'middle' : 'end';
+  const peakLabel = `<text x="${x(vals.length-1).toFixed(1)}" y="${Math.max(y(lastVal) - 11, 10).toFixed(1)}"
+      text-anchor="${labelAnchor}" font-size="10.5" fill="#1B1E2B" font-weight="600">₹${money(lastVal)}</text>`;
+
+  const axis = vals.map((v,i) => `<text x="${x(i).toFixed(1)}" y="${H-7}" text-anchor="middle" font-size="9.5" fill="#6B7183">${MONTH_LETTER[first + i]}</text>`).join('');
+
+  return `<svg class="trend" viewBox="0 0 ${W} ${H}" aria-label="Monthly spend across ${currentYear}">
+    ${limitLine}
+    <polyline points="${line}" fill="none" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    ${dots}${peakLabel}${axis}
+  </svg>`;
+}
+
+/* ---- the category picker ---- */
+function fillCatFilter(cats){
+  const sel = document.getElementById('catFilter');
+  const opts = ['<option value="">All categories</option>']
+    .concat([...cats].sort((a,b) => b.total - a.total)
+      .map(c => `<option value="${esc(c.cat)}">${esc(c.cat)}</option>`));
+  sel.innerHTML = opts.join('');
+  sel.value = filterCat && cats.some(c => c.cat === filterCat) ? filterCat : '';
+  sel.dataset.on = !!sel.value;
+}
+
 function render(){
   const rows = inPeriod();
-  const counted = rows.filter(e => !isOneTime(e.category));
-  const oneTime = rows.filter(e => isOneTime(e.category));
+  const periodCounted = rows.filter(e => !isOneTime(e.category));
+  const periodTotal = periodCounted.reduce((s,e) => s + e.amount, 0);
+
+  // what the filters leave behind
+  const dayRows = activeDate ? rows.filter(e => dayKey(e.ts) === activeDate) : rows;
+  const counted = dayRows.filter(e => !isOneTime(e.category));
+  const oneTime = dayRows.filter(e => isOneTime(e.category));
   const total = counted.reduce((s,e) => s + e.amount, 0);
   const oneTimeTotal = oneTime.reduce((s,e) => s + e.amount, 0);
-  const z = band(total);
 
   document.getElementById('periodLabel').textContent =
     viewMode === 'month' ? shortLabel(currentMonth) : currentYear;
 
-  const box = document.getElementById('totalBox');
-  box.className = 'total ' + (counted.length ? z : 'low');
-  document.getElementById('amountLine').innerHTML =
-    `${counted.length && z === 'mid' ? '<span class="warn">⚠</span>' : ''}<span class="sym">₹</span>${money(total)}`;
+  const countedCats = aggregate(counted).sort((a,b) => b.latest - a.latest);
+  const oneTimeCats = aggregate(oneTime).sort((a,b) => b.latest - a.latest);
+  const allCatsHere = [...countedCats, ...oneTimeCats];
+
+  if (filterCat && !allCatsHere.some(c => c.cat === filterCat)) filterCat = null;
+  fillCatFilter(allCatsHere);
+  document.getElementById('dateInput').dataset.on = !!activeDate;
+  document.getElementById('clearFilters').hidden = !filterCat && !activeDate;
+
+  const sel = filterCat ? allCatsHere.find(c => c.cat === filterCat) : null;
+
+  /* ---- chart: donut for a month, trend line for a year ---- */
+  const donutWrap = document.getElementById('donutWrap');
+  const trendWrap = document.getElementById('trendWrap');
+  donutWrap.hidden = viewMode !== 'month';
+  trendWrap.hidden = viewMode === 'month';
+
+  if (viewMode === 'month'){
+    document.getElementById('donut').innerHTML = donutHTML(countedCats, total);
+    const shownAmt = sel ? sel.total : total;
+    const amtStr = '₹' + money(shownAmt);
+    const size = amtStr.length > 10 ? 19 : amtStr.length > 8 ? 22 : 26;
+    const amtEl = document.getElementById('centerAmt');
+    amtEl.textContent = amtStr;
+    amtEl.style.fontSize = size + 'px';
+
+    // the centre's caption: category gets its share, a date gets the date
+    const dateLbl = activeDate ? fmtDate(new Date(activeDate + 'T00:00').getTime()) : '';
+    let caption;
+    if (sel){
+      const denom = total || 1;
+      const share = isOneTime(sel.cat) ? null : (sel.total / denom * 100);
+      caption = sel.cat + (share === null ? ' · one-time' : ` · ${share.toFixed(share < 10 ? 1 : 0)}%`) + (dateLbl ? ' · ' + dateLbl : '');
+    } else {
+      caption = dateLbl || (viewMode === 'month' ? labelFor(currentMonth).split(' ')[0] : currentYear);
+    }
+    document.getElementById('centerLbl').textContent = caption;
+  } else {
+    trendWrap.innerHTML = trendHTML();
+    trendWrap.querySelectorAll('.tpt').forEach(dot => dot.onclick = () => {
+      currentMonth = `${currentYear}-${String(+dot.dataset.m + 1).padStart(2,'0')}`;
+      viewMode = 'month';
+      document.querySelectorAll('#viewToggle button').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === 'month'));
+      render();
+    });
+  }
+
+  /* ---- meta, zone sentence, one-time note ---- */
   const dl = daysToReset();
   const ticker = dl === null ? '' : ` · <span class="ticker">${resetText(dl)}</span>`;
-  document.getElementById('totalMeta').innerHTML = rows.length
-    ? `${counted.length} ${counted.length === 1 ? 'entry' : 'entries'} in ${periodName()} · <span class="zone">${ZONE[z]}</span>${ticker}`
-    : `Nothing recorded in ${periodName()}${ticker}`;
+  const where = activeDate ? ' on ' + fmtDate(new Date(activeDate + 'T00:00').getTime()) : ' in ' + periodName();
+  document.getElementById('totalMeta').innerHTML = dayRows.length
+    ? `${counted.length} ${counted.length === 1 ? 'entry' : 'entries'}${where}${ticker}`
+    : `Nothing recorded${where}${ticker}`;
+
+  // the zone always judges the whole period, never one day or one category
+  const z = band(periodTotal);
+  document.getElementById('totalBox').className = 'viz total ' + (periodCounted.length ? z : '');
+  document.getElementById('zoneLine').textContent = periodCounted.length ? zoneSentence(periodTotal) : '';
   document.getElementById('subtotal').innerHTML = oneTimeTotal
     ? `One-time costs: <b>₹${money(oneTimeTotal)}</b> — not counted above`
     : '';
 
-  const sum = (list) => {
-    const by = {};
-    list.forEach(e => by[e.category] = (by[e.category] || 0) + e.amount);
-    return Object.entries(by).sort((a,b) => b[1] - a[1]);
-  };
-  const sorted = sum(counted), sortedOne = sum(oneTime);
-  const chart = document.getElementById('chart');
-
-  const barRow = (cat, amt, max, one) => {
-    const pct = total ? amt / total * 100 : 0;
-    return `<div class="bar-row${activeCat && activeCat !== cat ? ' dim' : ''}" data-cat="${esc(cat)}">
-      <div class="bar-head">
-        <div class="bar-name">${esc(cat)}${one ? '<span class="tag">one-time</span>' : ''}</div>
-        <div class="right">
-          <div class="bar-amt num">₹${money(amt)}</div>
-          <div class="bar-pct num" style="color:${colorFor(cat)}">${one ? '' : pct.toFixed(pct < 10 ? 1 : 0) + '%'}</div>
-        </div>
-      </div>
-      <div class="bar-track"><div class="bar-fill" style="width:${(amt/max*100).toFixed(2)}%;background:${colorFor(cat)}"></div></div>
-    </div>`;
-  };
-
-  if (!sorted.length && !sortedOne.length){
-    chart.innerHTML = `<p class="empty">Add your first expense and the split by category shows up here.</p>`;
+  /* ---- the list: blank until a filter is chosen ---- */
+  const wrap = document.getElementById('listWrap');
+  if (!filterCat && !activeDate){
+    wrap.innerHTML = `<p class="hint">Pick a category or a date — or tap a slice — to see the entries behind it.</p>`;
   } else {
-    const max = sorted.length ? sorted[0][1] : 1;
-    const maxOne = sortedOne.length ? sortedOne[0][1] : 1;
-    chart.innerHTML =
-      sorted.map(([c,a]) => barRow(c,a,max,false)).join('') +
-      (sortedOne.length ? `<div class="chart-divider">One-time costs</div>` + sortedOne.map(([c,a]) => barRow(c,a,maxOne,true)).join('') : '');
-    chart.querySelectorAll('.bar-row').forEach(r => r.onclick = () => {
-      activeCat = activeCat === r.dataset.cat ? null : r.dataset.cat;
-      render();
-    });
+    let listCats = filterCat ? allCatsHere.filter(c => c.cat === filterCat) : allCatsHere;
+    if (!listCats.length){
+      wrap.innerHTML = `<p class="hint">Nothing matches those filters.</p>`;
+    } else {
+      const rowHTML = (c) => {
+        const one = isOneTime(c.cat);
+        const open = openCat === c.cat;
+        const pct = total ? c.total / total * 100 : 0;
+        return `<div class="row">
+          <button class="row-head" data-cat="${esc(c.cat)}" aria-expanded="${open}">
+            <span class="r-left">
+              <i class="dot" style="background:${colorFor(c.cat)}"></i>
+              <span class="r-name">${esc(c.cat)}</span>
+              <span class="g-count">${c.items.length}</span>
+            </span>
+            <span class="r-right">
+              <span class="r-pct num">${one ? '' : pct.toFixed(pct < 10 ? 1 : 0) + '%'}</span>
+              <b class="num">₹${money(c.total)}</b>
+              <span class="chev${open ? ' open' : ''}">›</span>
+            </span>
+          </button>
+          ${open ? `<div class="panel">
+            <table class="tbl grp"><tbody>${c.items.map(e => `
+              <tr data-id="${e.id}">
+                <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
+                <td>${esc(e.mode)}${e.note ? `<span class="sub">${esc(e.note)}</span>` : ''}</td>
+                <td class="amt num">₹${money(e.amount)}</td>
+              </tr>`).join('')}</tbody></table>
+            <div class="panel-foot">
+              <button class="pill-btn" data-ot="${esc(c.cat)}" aria-pressed="${one}">${one ? 'One-time ✓' : 'Mark as one-time'}</button>
+            </div>
+          </div>` : ''}
+        </div>`;
+      };
+
+      // one category in view opens itself; several stay collapsed
+      if (listCats.length === 1) openCat = listCats[0].cat;
+      wrap.innerHTML = listCats.map(rowHTML).join('');
+
+      wrap.querySelectorAll('.row-head').forEach(h => h.onclick = () => {
+        openCat = openCat === h.dataset.cat ? null : h.dataset.cat;
+        render();
+      });
+      wrap.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
+      wrap.querySelectorAll('.pill-btn').forEach(b => b.onclick = () => {
+        const c = b.dataset.ot;
+        const wasOne = isOneTime(c);
+        db.excluded = wasOne ? db.excluded.filter(x => x !== c) : db.excluded.concat(c);
+        save(); render();
+        toast(wasOne ? `${c} counts towards the total again` : `${c} excluded from the total`);
+      });
+    }
   }
 
-  const wrap = document.getElementById('tableWrap');
-  let shown = rows;
-  if (activeCat) shown = shown.filter(e => e.category === activeCat);
-  if (activeDate) shown = shown.filter(e => dayKey(e.ts) === activeDate);
-  document.getElementById('clearDate').hidden = !activeDate;
-
-  let filterBar = '';
-  if (activeCat || activeDate){
-    const t = shown.reduce((s,e) => s + e.amount, 0);
-    const bits = [];
-    if (activeCat) bits.push(`<b>${esc(activeCat)}</b>`);
-    if (activeDate) bits.push(`<b>${fmtDate(new Date(activeDate + 'T00:00').getTime())}</b>`);
-    filterBar = `<div class="filterbar">
-      <span>${bits.join(' · ')} · ₹${money(t)} · ${shown.length} ${shown.length === 1 ? 'entry' : 'entries'}</span>
-      <span class="fb-actions">
-        ${activeCat ? `<button id="oneTimeBtn" aria-pressed="${isOneTime(activeCat)}">${isOneTime(activeCat) ? 'One-time ✓' : 'Mark one-time'}</button>` : ''}
-        <button id="clearFilter" class="x">Clear all</button>
-      </span></div>`;
-  }
-
-  if (!shown.length){
-    wrap.innerHTML = filterBar + `<p class="empty">${activeCat || activeDate ? 'Nothing matches these filters.' : `No entries in ${esc(periodName())}. Tap Add expense to record one.`}</p>`;
-  } else {
-    const groups = {};
-    shown.forEach(e => { (groups[e.category] = groups[e.category] || []).push(e); });
-    const gs = Object.entries(groups)
-      .map(([c,items]) => ({ c, items, total: items.reduce((s,x) => s + x.amount, 0), latest: Math.max(...items.map(x => x.ts)) }))
-      .sort((a,b) => b.latest - a.latest);
-    const forceOpen = !!activeCat || !!activeDate;
-
-    wrap.innerHTML = filterBar + gs.map(g => {
-      const open = forceOpen || openCats.has(g.c);
-      return `<div class="group">
-        <button class="group-head" data-cat="${esc(g.c)}">
-          <span class="g-left"><i class="dot" style="background:${colorFor(g.c)}"></i>${esc(g.c)}<span class="g-count">${g.items.length}</span></span>
-          <span class="g-right"><b class="num">₹${money(g.total)}</b><span class="chev${open ? ' open' : ''}">›</span></span>
-        </button>
-        ${open ? `<table class="tbl grp"><tbody>${g.items.map(e => `
-          <tr data-id="${e.id}">
-            <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
-            <td>${esc(e.mode)}${e.note ? `<span class="sub">${esc(e.note)}</span>` : ''}</td>
-            <td class="amt num">₹${money(e.amount)}</td>
-          </tr>`).join('')}</tbody></table>` : ''}
-      </div>`;
-    }).join('');
-
-    wrap.querySelectorAll('.group-head').forEach(h => h.onclick = () => {
-      if (forceOpen) return;
-      const c = h.dataset.cat;
-      openCats.has(c) ? openCats.delete(c) : openCats.add(c);
-      render();
-    });
-    wrap.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
-  }
-
-  const clearBtn = document.getElementById('clearFilter');
-  if (clearBtn) clearBtn.onclick = () => {
-    activeCat = null; activeDate = null;
-    document.getElementById('dateInput').value = '';
+  /* ---- tapping a slice is the same as picking that category ---- */
+  document.querySelectorAll('#donut .seg[data-cat]').forEach(seg => seg.onclick = () => {
+    const c = seg.dataset.cat;
+    filterCat = filterCat === c ? null : c;
+    openCat = filterCat;
     render();
-  };
-  const otBtn = document.getElementById('oneTimeBtn');
-  if (otBtn) otBtn.onclick = () => {
-    if (isOneTime(activeCat)) db.excluded = db.excluded.filter(c => c !== activeCat);
-    else db.excluded.push(activeCat);
-    save(); render();
-    toast(isOneTime(activeCat) ? `${activeCat} excluded from totals` : `${activeCat} back in totals`);
-  };
+  });
 
+  const bl = budgetLines();
+  document.getElementById('incomeState').textContent = viewMode === 'month'
+    ? `${labelFor(currentMonth).split(' ')[0]} budget ₹${money(Math.round(bl.cap))} — 40% of ₹${money(bl.income)} income.`
+    : `${currentYear} budget ₹${money(Math.round(bl.cap))} across ${bl.months} tracked month${bl.months === 1 ? '' : 's'}.`;
   renderBanners();
 }
 
@@ -646,7 +834,7 @@ document.querySelectorAll('#viewToggle button').forEach(b => b.onclick = () => {
     currentMonth = String(now.getFullYear()) === currentYear ? monthKey(now) : `${currentYear}-01`;
   }
   viewMode = next;
-  activeDate = null; document.getElementById('dateInput').value = '';
+  activeDate = null; document.getElementById('dateInput').value = ''; openCat = null;
   document.querySelectorAll('#viewToggle button').forEach(x => x.setAttribute('aria-pressed', x === b));
   render();
 });
@@ -680,7 +868,7 @@ periodBtn.onclick = (ev) => {
 
   menu.querySelectorAll('button').forEach(b => b.onclick = () => {
     if (viewMode === 'month') currentMonth = b.dataset.p; else currentYear = b.dataset.p;
-    activeDate = null; document.getElementById('dateInput').value = '';
+    activeDate = null; document.getElementById('dateInput').value = ''; openCat = null; filterCat = null;
     menu.classList.remove('open');
     periodBtn.setAttribute('aria-expanded', false);
     render();
@@ -691,19 +879,63 @@ document.addEventListener('click', () => {
   periodBtn.setAttribute('aria-expanded', false);
 });
 
-/* ============ date filter ============ */
+/* ============ filters ============ */
 const dateInput = document.getElementById('dateInput');
 dateInput.onchange = () => {
   activeDate = dateInput.value || null;
-  if (activeDate){
+  openCat = null;
+  if (activeDate && viewMode === 'month'){
     const d = new Date(activeDate + 'T00:00');
     currentMonth = monthKey(d);
     currentYear = String(d.getFullYear());
   }
   render();
 };
-document.getElementById('clearDate').onclick = () => {
-  activeDate = null; dateInput.value = ''; render();
+document.getElementById('catFilter').onchange = (ev) => {
+  filterCat = ev.target.value || null;
+  openCat = filterCat;
+  render();
+};
+document.getElementById('clearFilters').onclick = () => {
+  filterCat = null; activeDate = null; openCat = null;
+  dateInput.value = '';
+  render();
+};
+let incomeTargetMonth = null;   // which month the sheet is editing, null = the pre-set default
+
+function openIncomeSheet(){
+  incomeTargetMonth = viewMode === 'month' ? currentMonth : null;
+  const current = incomeTargetMonth ? incomeFor(incomeTargetMonth) : (db.income || 300000);
+  document.getElementById('incomeTitle').textContent = incomeTargetMonth
+    ? `Income for ${labelFor(incomeTargetMonth)}`
+    : 'Default monthly income';
+  const inp = document.getElementById('incomeIn');
+  inp.value = String(current);
+  updateIncomePreview();
+  document.getElementById('incomeHint').textContent = incomeTargetMonth
+    ? 'Applies from this month onward until you set a different figure. Earlier months keep theirs.'
+    : 'Used for any month with no figure of its own.';
+  openSheet(document.getElementById('incomeSheet'));
+}
+
+function updateIncomePreview(){
+  const v = parseFloat(String(document.getElementById('incomeIn').value).replace(/[^\d.]/g,''));
+  const out = document.getElementById('incomeOut');
+  if (!v || v <= 0){ out.textContent = ''; return; }
+  out.textContent = `Safe under ₹${money(Math.round(v * SAFE_PCT))} · budget cap ₹${money(Math.round(v * CAP_PCT))}`;
+}
+document.getElementById('incomeIn').addEventListener('input', updateIncomePreview);
+document.getElementById('editIncome').onclick = openIncomeSheet;
+document.getElementById('incomeCancel').onclick = closeSheets;
+document.getElementById('incomeSave').onclick = () => {
+  const v = parseFloat(String(document.getElementById('incomeIn').value).replace(/[^\d.]/g,''));
+  if (!v || v <= 0){ toast('Enter a valid amount'); return; }
+  if (incomeTargetMonth) db.incomes[incomeTargetMonth] = v;
+  else db.income = v;
+  save(); closeSheets(); render();
+  toast(incomeTargetMonth
+    ? `${labelFor(incomeTargetMonth).split(' ')[0]} income set to ₹${money(v)}`
+    : `Default income set to ₹${money(v)}`);
 };
 
 /* ============ add sheet ============ */
@@ -721,6 +953,7 @@ function closeSheets(){
   scrim.classList.remove('open');
   addSheet.classList.remove('open');
   detailSheet.classList.remove('open');
+  document.getElementById('incomeSheet').classList.remove('open');
   document.body.style.overflow = '';
 }
 scrim.onclick = closeSheets;
