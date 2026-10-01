@@ -210,6 +210,12 @@
   .chip{border:1px solid var(--rule);background:var(--card);padding:9px 13px;border-radius:999px;font-size:14px;display:flex;align-items:center;gap:7px}
   .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .kindbtn{border:1px solid var(--rule);background:var(--card);padding:12px 6px;border-radius:11px;font-size:13.5px;text-align:center}
+  .kindbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .split-row{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:14px;color:var(--ink-soft)}
+  .step{width:38px;height:38px;border-radius:10px;border:1px solid var(--rule);background:var(--card);font-size:19px;line-height:1;color:var(--ink)}
+  .months-in{width:52px;text-align:center;border:1px solid var(--rule);background:var(--card);border-radius:10px;padding:8px 4px;font-size:16px;font-weight:600;color:var(--ink)}
+  .ktag{color:#A0A5B3}
   .mode{border:1px solid var(--rule);background:var(--card);padding:12px 6px;border-radius:11px;font-size:13.5px;text-align:center}
   .mode[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .dt{width:100%;border:1px solid var(--rule);background:var(--card);border-radius:11px;padding:12px}
@@ -325,6 +331,23 @@
   </div>
 
   <div class="field">
+    <label>Counts as</label>
+    <div class="modes" id="kinds">
+      <button type="button" class="kindbtn" data-kind="month" aria-pressed="true">This month</button>
+      <button type="button" class="kindbtn" data-kind="split" aria-pressed="false">Split</button>
+      <button type="button" class="kindbtn" data-kind="onetime" aria-pressed="false">One-time</button>
+    </div>
+    <div class="split-row" id="splitRow" hidden>
+      <span>Spread over</span>
+      <button type="button" class="step" id="mMinus" aria-label="One month fewer">−</button>
+      <input class="months-in num" id="monthsIn" type="text" inputmode="numeric" value="6" aria-label="Number of months">
+      <button type="button" class="step" id="mPlus" aria-label="One month more">+</button>
+      <span>months</span>
+    </div>
+    <div class="calcout ok" id="kindOut"></div>
+  </div>
+
+  <div class="field">
     <label>When</label>
     <div class="when-row">
       <span id="whenText" class="num">—</span>
@@ -432,6 +455,7 @@ function loadFrom(raw){
 }
 const loaded = loadFrom(ls.get(KEY));
 if (loaded) db = loaded;
+if (migrate()) save();
 
 function mergeInto(target, incoming){
   if (!incoming) return false;
@@ -456,7 +480,40 @@ function save(){
 }
 
 const allCats = () => BASE_CATS.concat(db.customCats);
-const isOneTime = (cat) => db.excluded.includes(cat);
+// every transaction counts one of three ways: this month (default), one-time, or split over N months
+const kindOf = (e) => e.kind || 'month';
+const isOneTimeEntry = (e) => kindOf(e) === 'onetime';
+
+// one-time used to be a per-category switch; carry those entries across once, then retire the switch
+function migrate(){
+  if (!db.excluded || !db.excluded.length) return false;
+  db.expenses.forEach(e => { if (!e.kind && db.excluded.includes(e.category)) e.kind = 'onetime'; });
+  db.excluded = [];
+  return true;
+}
+
+// the single source every total reads from: split entries become one instalment per month
+function ledger(){
+  const out = [];
+  db.expenses.forEach(e => {
+    if (kindOf(e) === 'split' && e.months > 1){
+      const n = e.months, d0 = new Date(e.ts);
+      const each = Math.floor(e.amount / n * 100) / 100;
+      for (let k = 0; k < n; k++){
+        const lastDay = new Date(d0.getFullYear(), d0.getMonth() + k + 1, 0).getDate();
+        const ts = new Date(d0.getFullYear(), d0.getMonth() + k, Math.min(d0.getDate(), lastDay),
+                            d0.getHours(), d0.getMinutes()).getTime();
+        const amount = k === n - 1 ? Math.round((e.amount - each * (n - 1)) * 100) / 100 : each;
+        out.push({ ...e, ts, amount, part: k + 1, of: n, full: e.amount });
+      }
+    } else out.push(e);
+  });
+  return out;
+}
+
+// the small grey note that says how a row is counted
+const kindTag = (e) => e.part ? ` · <span class="ktag">${e.part} of ${e.of} · ₹${money(e.full)} split</span>`
+                     : isOneTimeEntry(e) ? ` · <span class="ktag">one-time</span>` : '';
 const colorFor = (cat) => {
   const list = allCats();
   const i = list.indexOf(cat);
@@ -494,7 +551,7 @@ function toast(msg){
 
 /* ============ period ============ */
 function inPeriod(){
-  return db.expenses.filter(e => {
+  return ledger().filter(e => {
     const d = new Date(e.ts);
     return viewMode === 'month'
       ? monthKey(d) === currentMonth
@@ -510,10 +567,11 @@ function incomeFor(mk){
   return db.income > 0 ? db.income : 300000;
 }
 function trackedMonths(){
-  const seen = new Set();
-  db.expenses.forEach(e => {
+  const seen = new Set(), nowKey = monthKey(new Date());
+  ledger().forEach(e => {
     const d = new Date(e.ts);
-    if (String(d.getFullYear()) === currentYear) seen.add(monthKey(d));
+    // future instalments of a split don't count as months you've tracked yet
+    if (String(d.getFullYear()) === currentYear && monthKey(d) <= nowKey) seen.add(monthKey(d));
   });
   return [...seen].sort();
 }
@@ -608,10 +666,10 @@ function trendHTML(){
   const W = 320, H = 178, L = 26, R = 26, T = 26, B = 24;
   const totals = Array(12).fill(0);
   let any = false;
-  db.expenses.forEach(e => {
+  ledger().forEach(e => {
     const d = new Date(e.ts);
     if (String(d.getFullYear()) !== currentYear) return;
-    if (filterCat ? e.category !== filterCat : isOneTime(e.category)) return;
+    if (filterCat ? e.category !== filterCat : isOneTimeEntry(e)) return;
     totals[d.getMonth()] += e.amount;
     any = true;
   });
@@ -670,8 +728,8 @@ function fillCatFilter(cats, restCount){
   const sel = document.getElementById('catFilter');
   const opts = ['<option value="">All categories</option>']
     .concat(restCount ? [`<option value="__rest">Everything else (${restCount})</option>`] : [])
-    .concat([...cats].sort((a,b) => b.total - a.total)
-      .map(c => `<option value="${esc(c.cat)}">${esc(c.cat)}</option>`));
+    .concat([...new Set([...cats].sort((a,b) => b.total - a.total).map(c => c.cat))]
+      .map(c => `<option value="${esc(c)}">${esc(c)}</option>`));
   sel.innerHTML = opts.join('');
   const valid = filterCat === '__rest' ? !!restCount : cats.some(c => c.cat === filterCat);
   sel.value = filterCat && valid ? filterCat : '';
@@ -680,13 +738,13 @@ function fillCatFilter(cats, restCount){
 
 function render(){
   const rows = inPeriod();
-  const periodCounted = rows.filter(e => !isOneTime(e.category));
+  const periodCounted = rows.filter(e => !isOneTimeEntry(e));
   const periodTotal = periodCounted.reduce((s,e) => s + e.amount, 0);
 
   // what the filters leave behind
   const dayRows = activeDate ? rows.filter(e => dayKey(e.ts) === activeDate) : rows;
-  const counted = dayRows.filter(e => !isOneTime(e.category));
-  const oneTime = dayRows.filter(e => isOneTime(e.category));
+  const counted = dayRows.filter(e => !isOneTimeEntry(e));
+  const oneTime = dayRows.filter(e => isOneTimeEntry(e));
   const total = counted.reduce((s,e) => s + e.amount, 0);
   const oneTimeTotal = oneTime.reduce((s,e) => s + e.amount, 0);
 
@@ -694,7 +752,7 @@ function render(){
     viewMode === 'month' ? shortLabel(currentMonth) : currentYear;
 
   const countedCats = aggregate(counted).sort((a,b) => b.latest - a.latest);
-  const oneTimeCats = aggregate(oneTime).sort((a,b) => b.latest - a.latest);
+  const oneTimeCats = aggregate(oneTime).sort((a,b) => b.latest - a.latest).map(c => ({ ...c, one: true }));
   const allCatsHere = [...countedCats, ...oneTimeCats];
 
   const restCats = viewMode === 'month'
@@ -733,7 +791,7 @@ function render(){
     let caption;
     if (sel){
       const denom = total || 1;
-      const share = (!sel.isRest && isOneTime(sel.cat)) ? null : (sel.total / denom * 100);
+      const share = sel.one ? null : (sel.total / denom * 100);
       caption = sel.cat + (share === null ? ' · one-time' : ` · ${share.toFixed(share < 10 ? 1 : 0)}%`) + (dateLbl ? ' · ' + dateLbl : '');
     } else {
       caption = dateLbl || (viewMode === 'month' ? labelFor(currentMonth).split(' ')[0] : currentYear);
@@ -777,7 +835,7 @@ function render(){
            <tr data-id="${e.id}">
              <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
              <td><div class="cat-cell"><i class="dot" style="background:${colorFor(e.category)}"></i>${esc(e.category)}</div>
-                 <span class="sub">${esc(e.mode)}${e.note ? ' · ' + esc(e.note) : ''}</span></td>
+                 <span class="sub">${esc(e.mode)}${e.note ? ' · ' + esc(e.note) : ''}${kindTag(e)}</span></td>
              <td class="amt num">₹${money(e.amount)}</td>
            </tr>`).join('')}</tbody></table>`;
     wrap.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
@@ -792,7 +850,7 @@ function render(){
       <table class="tbl grp"><tbody>${restAgg.items.map(e => `
         <tr data-id="${e.id}">
           <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
-          <td>${esc(e.mode)}${e.note ? ' · ' + esc(e.note) : ''}<span class="sub cat-tag">${esc(e.category)}</span></td>
+          <td>${esc(e.mode)}${e.note ? ' · ' + esc(e.note) : ''}${kindTag(e)}<span class="sub cat-tag">${esc(e.category)}</span></td>
           <td class="amt num">₹${money(e.amount)}</td>
         </tr>`).join('')}</tbody></table>`;
     wrap.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
@@ -802,14 +860,15 @@ function render(){
       wrap.innerHTML = `<p class="hint">Nothing matches those filters.</p>`;
     } else {
       const rowHTML = (c) => {
-        const one = isOneTime(c.cat);
-        const open = openCat === c.cat;
+        const one = !!c.one;
+        const key = (one ? 'ot:' : '') + c.cat;
+        const open = openCat === key || (!!filterCat && listCats.length > 1);
         const pct = total ? c.total / total * 100 : 0;
         return `<div class="row">
-          <button class="row-head" data-cat="${esc(c.cat)}" aria-expanded="${open}">
+          <button class="row-head" data-cat="${esc(key)}" aria-expanded="${open}">
             <span class="r-left">
               <i class="dot" style="background:${colorFor(c.cat)}"></i>
-              <span class="r-name">${esc(c.cat)}</span>
+              <span class="r-name">${esc(c.cat)}${one ? '<span class="tag">one-time</span>' : ''}</span>
               <span class="g-count">${c.items.length}</span>
             </span>
             <span class="r-right">
@@ -822,18 +881,15 @@ function render(){
             <table class="tbl grp"><tbody>${c.items.map(e => `
               <tr data-id="${e.id}">
                 <td class="num">${fmtDate(e.ts)}<span class="sub">${fmtTime(e.ts)}</span></td>
-                <td>${esc(e.mode)}${e.note ? `<span class="sub">${esc(e.note)}</span>` : ''}</td>
+                <td>${esc(e.mode)}${kindTag(e)}${e.note ? `<span class="sub">${esc(e.note)}</span>` : ''}</td>
                 <td class="amt num">₹${money(e.amount)}</td>
               </tr>`).join('')}</tbody></table>
-            <div class="panel-foot">
-              <button class="pill-btn" data-ot="${esc(c.cat)}" aria-pressed="${one}">${one ? 'One-time ✓' : 'Mark as one-time'}</button>
-            </div>
           </div>` : ''}
         </div>`;
       };
 
       // one category in view opens itself; several stay collapsed
-      if (listCats.length === 1) openCat = listCats[0].cat;
+      if (listCats.length === 1) openCat = (listCats[0].one ? 'ot:' : '') + listCats[0].cat;
       wrap.innerHTML = listCats.map(rowHTML).join('');
 
       wrap.querySelectorAll('.row-head').forEach(h => h.onclick = () => {
@@ -841,13 +897,6 @@ function render(){
         render();
       });
       wrap.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
-      wrap.querySelectorAll('.pill-btn').forEach(b => b.onclick = () => {
-        const c = b.dataset.ot;
-        const wasOne = isOneTime(c);
-        db.excluded = wasOne ? db.excluded.filter(x => x !== c) : db.excluded.concat(c);
-        save(); render();
-        toast(wasOne ? `${c} counts towards the total again` : `${c} excluded from the total`);
-      });
     }
   }
 
@@ -917,7 +966,7 @@ periodBtn.onclick = (ev) => {
   if (!open) return;
 
   const totals = {};
-  db.expenses.forEach(e => {
+  ledger().filter(e => !isOneTimeEntry(e)).forEach(e => {
     const d = new Date(e.ts);
     const k = viewMode === 'month' ? monthKey(d) : String(d.getFullYear());
     totals[k] = (totals[k] || 0) + e.amount;
@@ -1014,6 +1063,38 @@ const newCat = document.getElementById('newCat');
 const errEl = document.getElementById('err');
 const saveBtn = document.getElementById('saveBtn');
 let pickedCat = null, pickedMode = null, saving = false, editingId = null;
+let pickedKind = 'month', kindTouched = false;
+const monthsIn = () => document.getElementById('monthsIn');
+const clampMonths = (v) => Math.min(36, Math.max(2, Math.round(Number(v) || 0)));
+
+function setKind(k, byHand){
+  pickedKind = k;
+  if (byHand) kindTouched = true;
+  document.querySelectorAll('.kindbtn').forEach(b => b.setAttribute('aria-pressed', b.dataset.kind === k));
+  document.getElementById('splitRow').hidden = k !== 'split';
+  updateKindPreview();
+}
+// says, in rupees and months, exactly what the choice will do
+function updateKindPreview(){
+  const out = document.getElementById('kindOut');
+  if (pickedKind === 'onetime'){ out.textContent = 'Kept out of the monthly total — shown under one-time costs'; return; }
+  if (pickedKind !== 'split'){ out.textContent = ''; return; }
+  const amt = evalExpr(amtIn.value);
+  const n = clampMonths(monthsIn().value);
+  const v = document.getElementById('when').value;
+  const d0 = v ? new Date(v) : new Date();
+  const end = new Date(d0.getFullYear(), d0.getMonth() + n - 1, 1);
+  const span = `${MONTHS[d0.getMonth()].slice(0,3)} → ${MONTHS[end.getMonth()].slice(0,3)} ${String(end.getFullYear()).slice(2)}`;
+  out.textContent = amt && amt > 0
+    ? `₹${money(Math.round(amt / n * 100) / 100)} a month for ${n} months · ${span}`
+    : `${n} equal monthly parts · ${span}`;
+}
+document.querySelectorAll('.kindbtn').forEach(b => b.onclick = () => setKind(b.dataset.kind, true));
+document.getElementById('mMinus').onclick = () => { monthsIn().value = clampMonths(monthsIn().value - 1); updateKindPreview(); };
+document.getElementById('mPlus').onclick  = () => { monthsIn().value = clampMonths(+monthsIn().value + 1); updateKindPreview(); };
+document.getElementById('monthsIn').addEventListener('input', updateKindPreview);
+document.getElementById('monthsIn').addEventListener('blur', () => { monthsIn().value = clampMonths(monthsIn().value); updateKindPreview(); });
+document.getElementById('amt').addEventListener('input', () => updateKindPreview());
 
 function openSheet(el){ scrim.classList.add('open'); el.classList.add('open'); document.body.style.overflow = 'hidden'; }
 function closeSheets(){
@@ -1068,6 +1149,10 @@ function drawChips(){
     + `<button type="button" class="chip" data-cat="__other" aria-pressed="${pickedCat === '__other'}">Other</button>`;
   box.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
     pickedCat = b.dataset.cat;
+    if (!editingId && !kindTouched){
+      const last = db.expenses.filter(e => e.category === pickedCat).sort((a,b) => touched(b) - touched(a))[0];
+      setKind(last && isOneTimeEntry(last) ? 'onetime' : 'month', false);
+    }
     newCat.hidden = pickedCat !== '__other';
     if (pickedCat === '__other'){ newCat.value = ''; newCat.focus(); }
     drawChips();
@@ -1082,7 +1167,7 @@ function syncWhenText(){
   document.getElementById('whenText').textContent =
     (sameDay ? 'Today' : fmtDate(d.getTime())) + ', ' + fmtTime(d.getTime());
 }
-document.getElementById('when').addEventListener('change', syncWhenText);
+document.getElementById('when').addEventListener('change', () => { syncWhenText(); updateKindPreview(); });
 document.getElementById('whenEdit').onclick = (ev) => {
   const inp = document.getElementById('when');
   inp.hidden = !inp.hidden;
@@ -1111,6 +1196,9 @@ function openForm(existing){
   document.getElementById('whenEdit').setAttribute('aria-pressed','false');
   syncWhenText();
   document.querySelectorAll('.mode').forEach(m => m.setAttribute('aria-pressed', pickedMode === m.dataset.mode));
+  kindTouched = !!existing;
+  monthsIn().value = existing && existing.months ? existing.months : 6;
+  setKind(existing ? kindOf(existing) : 'month', false);
 
   drawChips();
   openSheet(addSheet);
@@ -1223,6 +1311,9 @@ saveBtn.addEventListener('click', () => {
   const ts = whenVal ? new Date(whenVal).getTime() : Date.now();
   const note = document.getElementById('note').value.trim();
 
+  const kind = pickedKind;
+  const months = kind === 'split' ? clampMonths(monthsIn().value) : undefined;
+
   const dupe = !editingId && db.expenses.find(e =>
     e.amount === amount && e.category === category && e.mode === pickedMode &&
     (e.note || '') === note && Math.abs(e.ts - ts) < 2000);
@@ -1234,9 +1325,14 @@ saveBtn.addEventListener('click', () => {
 
   if (editingId){
     const e = db.expenses.find(x => x.id === editingId);
-    if (e) Object.assign(e, { amount, category, mode: pickedMode, ts, note, updatedAt: Date.now() });
+    if (e){
+      Object.assign(e, { amount, category, mode: pickedMode, ts, note, kind, updatedAt: Date.now() });
+      if (months) e.months = months; else delete e.months;
+    }
   } else {
-    db.expenses.push({ id: `${ts}-${Math.random().toString(36).slice(2,8)}`, amount, category, mode: pickedMode, ts, note, updatedAt: Date.now() });
+    const rec = { id: `${ts}-${Math.random().toString(36).slice(2,8)}`, amount, category, mode: pickedMode, ts, note, kind, updatedAt: Date.now() };
+    if (months) rec.months = months;
+    db.expenses.push(rec);
   }
   save();
 
@@ -1246,10 +1342,19 @@ saveBtn.addEventListener('click', () => {
   editingId = null;
   closeSheets();
   render();
-  toast(wasEdit ? 'Changes saved' : `₹${money(amount)} recorded`);
+  toast(wasEdit ? 'Changes saved'
+      : kind === 'split' ? `₹${money(amount)} split over ${months} months`
+      : kind === 'onetime' ? `₹${money(amount)} recorded as one-time`
+      : `₹${money(amount)} recorded`);
 });
 
 /* ============ detail ============ */
+function countsAs(e){
+  if (isOneTimeEntry(e)) return 'One-time';
+  if (kindOf(e) !== 'split') return 'This month';
+  const d0 = new Date(e.ts), end = new Date(d0.getFullYear(), d0.getMonth() + e.months - 1, 1);
+  return `₹${money(Math.round(e.amount / e.months * 100) / 100)} a month × ${e.months}<span class="sub">${shortLabel(monthKey(d0))} → ${shortLabel(monthKey(end))}</span>`;
+}
 let detailId = null;
 function openDetail(id){
   const e = db.expenses.find(x => x.id === id);
@@ -1261,12 +1366,15 @@ function openDetail(id){
     <div class="detail-line"><span>Category</span><b>${esc(e.category)}</b></div>
     <div class="detail-line"><span>Paid by</span><b>${esc(e.mode)}</b></div>
     <div class="detail-line"><span>Recorded</span><b class="num">${fmtDate(e.ts)}, ${fmtTime(e.ts)}</b></div>
+    <div class="detail-line"><span>Counts as</span><b>${countsAs(e)}</b></div>
     ${e.note ? `<div class="detail-line"><span>Comment</span><b>${esc(e.note)}</b></div>` : ''}`;
   openSheet(detailSheet);
 }
 document.getElementById('deleteBtn').onclick = () => {
+  const gone = db.expenses.find(x => x.id === detailId);
   db.expenses = db.expenses.filter(x => x.id !== detailId);
-  save(); closeSheets(); render(); toast('Expense deleted');
+  save(); closeSheets(); render();
+  toast(gone && kindOf(gone) === 'split' ? `Deleted — all ${gone.months} months removed` : 'Expense deleted');
 };
 
 /* ============ backup and restore ============ */
@@ -1303,6 +1411,7 @@ document.getElementById('importFile').onchange = (ev) => {
     if (!incoming){ toast('That file is not a backup'); return; }
     const before = db.expenses.length;
     mergeInto(db, incoming);
+    migrate();
     save(); render();
     toast(`${db.expenses.length - before} entries restored`);
   };
@@ -1334,6 +1443,7 @@ render();
 (async () => {
   const mirror = loadFrom(await idb.get(KEY));
   const recovered = mergeInto(db, mirror);
+  migrate();
   save();
   if (recovered){ render(); toast('Recovered entries from backup copy'); }
 })();
